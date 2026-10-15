@@ -1,0 +1,66 @@
+.labelText {
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-label);
+}
+
+.controlText {
+  composes: labelText;
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.secondaryText {
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
+}
+
+.subheadingText {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-subheading);
+  text-wrap: balance;
+}
+
+.pressable {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: var(--transition-control);
+}
+
+.pressable:active {
+  transition: var(--transition-control-press);
+}
+
+.statePanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--state-min-height);
+  padding: var(--space-24);
+  text-align: center;
+  animation: var(--motion-fade-in);
+}
+
+.fieldSurface {
+  min-block-size: var(--control-height);
+  padding-inline: var(--space-12);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+  box-shadow: var(--shadow-ring);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monoText {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
+}

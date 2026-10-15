@@ -1,0 +1,20 @@
+{
+  "title": "Workspace",
+  "description": "This screen is a placeholder. Replace it with the first product screen built from the same shared components.",
+  "formats": {
+    "title": "Locale formats",
+    "description": "Numbers, amounts and dates follow the interface language.",
+    "number": "Number",
+    "percent": "Share",
+    "money": "Amount",
+    "date": "Date",
+    "count": "Count",
+    "records_one": "{{count, number}} record",
+    "records_other": "{{count, number}} records",
+    "missing": "Missing value"
+  },
+  "empty": {
+    "title": "Nothing here yet",
+    "description": "An empty state says why the area is empty and what to do next."
+  }
+}

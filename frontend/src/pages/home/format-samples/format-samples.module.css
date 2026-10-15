@@ -1,0 +1,22 @@
+.terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--term-min), 1fr));
+  gap: var(--space-16);
+}
+
+.term {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.value {
+  font-weight: var(--weight-medium);
+  font-variant-numeric: var(--font-numeric);
+  overflow-wrap: anywhere;
+}

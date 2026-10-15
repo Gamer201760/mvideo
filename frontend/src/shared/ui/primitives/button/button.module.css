@@ -1,0 +1,96 @@
+.button {
+  composes: controlText pressable from "../../../styles/compose.module.css";
+  --button-surface: var(--action-primary);
+  --button-surface-hover: var(--action-primary-hover);
+  --button-surface-press: var(--action-primary-press);
+  --button-text: var(--action-primary-text);
+  --button-height: var(--control-height);
+  --button-padding: var(--space-20);
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-block-size: var(--button-height);
+  padding-inline: var(--button-padding);
+  border-radius: var(--radius-md);
+  background-color: var(--button-surface);
+  color: var(--button-text);
+  text-decoration: none;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset-block: calc((var(--button-height) - var(--target-min)) / 2);
+  inset-inline: 0;
+}
+
+.primary {
+  --button-surface: var(--action-primary);
+}
+
+.secondary {
+  --button-surface: transparent;
+  --button-surface-hover: var(--action-ghost-hover);
+  --button-surface-press: var(--action-ghost-press);
+  --button-text: var(--text-primary);
+
+  box-shadow: var(--shadow-ring);
+}
+
+.ghost {
+  --button-surface: transparent;
+  --button-surface-hover: var(--action-ghost-hover);
+  --button-surface-press: var(--action-ghost-press);
+  --button-text: var(--text-primary);
+  --button-padding: var(--space-12);
+}
+
+.compact {
+  --button-height: var(--control-height-compact);
+  --button-padding: var(--space-16);
+}
+
+.ghost.compact {
+  --button-padding: var(--space-8);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--button-surface-hover);
+  }
+}
+
+.button:active:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--button-surface-press);
+  scale: var(--press-scale);
+}
+
+.button:disabled {
+  --button-surface: var(--action-disabled);
+  --button-text: var(--text-disabled);
+}
+
+.button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.content,
+.loader {
+  grid-area: 1 / 1;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  transition: var(--transition-fade);
+}
+
+.content[data-pending="true"] {
+  opacity: 0;
+}
+
+.loader {
+  animation: var(--motion-spin);
+}

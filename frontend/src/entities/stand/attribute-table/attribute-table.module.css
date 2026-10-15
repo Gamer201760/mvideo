@@ -1,0 +1,83 @@
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
+}
+
+.head {
+  composes: labelText from "../../../shared/styles/compose.module.css";
+  padding: var(--space-8) var(--space-12);
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+  text-align: start;
+}
+
+.row {
+  border-block-start: var(--hairline) solid var(--border-subtle);
+}
+
+.row > * {
+  padding: var(--space-12);
+  text-align: start;
+  vertical-align: top;
+}
+
+.attribute {
+  color: var(--text-secondary);
+  font-weight: var(--weight-regular);
+}
+
+.value {
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.confidence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.number {
+  min-inline-size: var(--space-40);
+  font-variant-numeric: tabular-nums;
+}
+
+.source {
+  color: var(--text-secondary);
+}
+
+.quote {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 48rem) {
+  .headRow {
+    display: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-4) var(--space-12);
+    padding-block: var(--space-12);
+  }
+
+  .row > * {
+    padding: 0;
+  }
+
+  .value,
+  .quote {
+    grid-column: 1 / -1;
+  }
+
+  .confidence {
+    grid-column: 1 / -1;
+  }
+}

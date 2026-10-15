@@ -1,0 +1,6 @@
+.page {
+  display: grid;
+  align-content: center;
+  min-block-size: 100dvh;
+  padding: var(--space-page);
+}

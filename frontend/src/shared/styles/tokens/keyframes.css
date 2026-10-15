@@ -1,0 +1,65 @@
+@keyframes kf-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kf-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes kf-scale-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--shift-anchor)) scale(var(--enter-scale));
+  }
+}
+
+@keyframes kf-scale-out {
+  to {
+    opacity: 0;
+    transform: scale(var(--enter-scale));
+  }
+}
+
+@keyframes kf-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--shift-rise));
+  }
+}
+
+@keyframes kf-swap-out {
+  to {
+    opacity: 0;
+    filter: blur(var(--blur-soft));
+    transform: translateY(calc(var(--shift-rise) * -1));
+  }
+}
+
+@keyframes kf-swap-in {
+  from {
+    opacity: 0;
+    filter: blur(var(--blur-soft));
+    transform: translateY(var(--shift-rise));
+  }
+}
+
+@keyframes kf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kf-shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}

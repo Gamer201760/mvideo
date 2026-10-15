@@ -1,0 +1,11 @@
+.fallback {
+  display: grid;
+  gap: var(--space-16);
+  padding: var(--space-page);
+  animation: var(--motion-fade-in);
+  animation-delay: var(--delay-skeleton);
+}
+
+.heading {
+  max-inline-size: var(--prose-measure);
+}

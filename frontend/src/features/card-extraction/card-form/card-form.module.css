@@ -1,0 +1,8 @@
+.card {
+  min-inline-size: 0;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-16);
+}

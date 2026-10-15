@@ -1,0 +1,7 @@
+{
+  "title": "API connection",
+  "ok": "The API responds",
+  "checkedAt": "Checked at {{time}}",
+  "recheck": "Check again",
+  "loading": "Checking the API"
+}

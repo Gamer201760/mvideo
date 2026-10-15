@@ -1,0 +1,99 @@
+{
+  "title": "Attributes from a product card",
+  "description": "Paste a seller card or pick a sample. Every value comes with a quote from the card, a confidence score and the step that found it. Values below the threshold wait for a person in the review queue.",
+  "form": {
+    "title": "Product card",
+    "example": "Sample from the test set",
+    "examplePlaceholder": "Pick a sample card",
+    "category": "Category",
+    "categoryPlaceholder": "Pick a category",
+    "categoryHint_one": "{{count, number}} required attribute",
+    "categoryHint_other": "{{count, number}} required attributes",
+    "titleField": "Title",
+    "titlePlaceholder": "Smartphone Samsung Galaxy A55 8/256 GB",
+    "descriptionField": "Description",
+    "descriptionPlaceholder": "Free text from the seller",
+    "seller": "Seller attributes",
+    "sellerHint": "One per line, as name: value",
+    "sellerPlaceholder": "Color: black",
+    "submit": "Extract attributes"
+  },
+  "result": {
+    "title": "Extracted attributes",
+    "threshold": "Threshold {{value}}",
+    "empty": {
+      "title": "No card yet",
+      "description": "Pick a sample or paste a card on the left, then run the extraction."
+    },
+    "loading": "Extracting attributes",
+    "textTitle": "Card text with quotes",
+    "columns": {
+      "attribute": "Attribute",
+      "value": "Value",
+      "confidence": "Confidence",
+      "source": "Source",
+      "quote": "Quote"
+    },
+    "status": {
+      "accepted": "In the catalog",
+      "review": "Needs review"
+    },
+    "missingTitle": "Not found in the text",
+    "missingNone": "Every required attribute has a value"
+  },
+  "source": {
+    "key_value": "Key and value line",
+    "seller": "Seller attribute",
+    "dictionary": "Dictionary",
+    "number": "Number and unit",
+    "title_model": "Model from the title",
+    "review": "Confirmed by a person",
+    "catalog_twin": "Catalog twin",
+    "other": "Other rule",
+    "neighbor": "Catalog neighbour hint"
+  },
+  "review": {
+    "title": "Review queue",
+    "description": "Low confidence values. A decision here becomes a dictionary alias and the card is extracted again.",
+    "count_one": "{{count, number}} waiting",
+    "count_other": "{{count, number}} waiting",
+    "empty": {
+      "title": "Queue is empty",
+      "description": "Values below the threshold appear here after an extraction."
+    },
+    "loading": "Loading the queue",
+    "confidence": "Confidence {{value}}",
+    "accept": "Accept",
+    "correct": "Correct",
+    "save": "Save",
+    "cancel": "Cancel",
+    "valueLabel": "Correct value for {{attribute}}"
+  },
+  "mode": {
+    "label": "Input",
+    "card": "Card by fields",
+    "text": "Plain text"
+  },
+  "text": {
+    "title": "Plain text",
+    "field": "Text or page HTML",
+    "placeholder": "Paste a product description or a whole copied shop page",
+    "hint": "Menus, scripts, the footer and the “similar products” block are dropped; quotes point into this text",
+    "submit": "Find category and attributes",
+    "category": "Category",
+    "categoryUnknown": "Category unknown: confidence is below the threshold",
+    "categoryConfidence": "confidence {{value}}",
+    "candidates": "Candidates",
+    "productTitle": "Title",
+    "titleNone": "No title found in the text",
+    "titleSource": {
+      "llm": "found by the LLM",
+      "rule": "found by a rule"
+    },
+    "search": {
+      "embeddings": "embedding search",
+      "tfidf": "TF-IDF search"
+    },
+    "cleanTitle": "Cleaned text with quotes"
+  }
+}

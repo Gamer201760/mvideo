@@ -1,0 +1,26 @@
+.text {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  max-inline-size: var(--prose-measure);
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.mark {
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-selected);
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--status-success);
+  text-underline-offset: var(--space-4);
+}
+
+.mark[data-status="review"] {
+  text-decoration-style: dashed;
+  text-decoration-color: var(--status-warning);
+}
+
+.mark[data-active="true"] {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+}

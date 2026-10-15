@@ -1,0 +1,15 @@
+:root {
+  --layer-raised: 1;
+  --layer-sticky: 10;
+  --layer-popover: 40;
+  --layer-dialog: 50;
+  --layer-toast: 55;
+  --layer-tooltip: 60;
+  --layer-skip-link: 70;
+
+  --shadow-ring: inset 0 0 0 var(--hairline) var(--border-strong);
+  --shadow-raised: 0 1px 2px var(--shadow-color);
+  --shadow-float: 0 1px 2px var(--shadow-color), 0 8px 24px var(--shadow-color);
+
+  --opacity-stale: 0.55;
+}

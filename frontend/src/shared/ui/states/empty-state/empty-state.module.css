@@ -1,0 +1,22 @@
+.empty {
+  composes: statePanel from "../../../styles/compose.module.css";
+  gap: var(--space-8);
+}
+
+.icon {
+  margin-block-end: var(--space-4);
+  color: var(--text-muted);
+}
+
+.title {
+  composes: subheadingText from "../../../styles/compose.module.css";
+}
+
+.description {
+  composes: secondaryText from "../../../styles/compose.module.css";
+  max-inline-size: var(--prose-measure);
+}
+
+.action {
+  margin-block-start: var(--space-8);
+}

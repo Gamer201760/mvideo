@@ -1,0 +1,23 @@
+.error {
+  composes: statePanel from "../../../styles/compose.module.css";
+  gap: var(--space-8);
+}
+
+.icon {
+  color: var(--status-danger);
+}
+
+.title {
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.description {
+  composes: secondaryText from "../../../styles/compose.module.css";
+  max-inline-size: var(--prose-measure);
+  overflow-wrap: anywhere;
+}
+
+.retry {
+  margin-block-start: var(--space-8);
+}

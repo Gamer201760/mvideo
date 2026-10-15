@@ -1,0 +1,13 @@
+.missing {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-8);
+  max-inline-size: var(--prose-measure);
+  margin: 0;
+}
+
+.label {
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+}

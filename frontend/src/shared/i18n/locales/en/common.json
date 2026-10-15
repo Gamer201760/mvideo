@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "Product attributes",
+    "tagline": "Attribute extraction with quotes"
+  },
+  "meta": {
+    "description": "Extracts product attributes from a seller card: every value has a quote, a confidence and a review queue."
+  },
+  "shell": {
+    "skip": "Skip to content"
+  },
+  "action": {
+    "retry": "Try again",
+    "home": "Go to the start page"
+  },
+  "state": {
+    "loading": "Loading"
+  },
+  "value": {
+    "none": "not set",
+    "noneLabel": "No value"
+  },
+  "theme": {
+    "legend": "Theme",
+    "light": "Light theme",
+    "dark": "Dark theme"
+  },
+  "language": {
+    "legend": "Interface language",
+    "ru": "Russian",
+    "en": "English",
+    "short": {
+      "ru": "RU",
+      "en": "EN"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The address may contain a typo, or the page has moved."
+  }
+}

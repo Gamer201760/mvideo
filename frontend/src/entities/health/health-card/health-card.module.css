@@ -1,0 +1,36 @@
+.body {
+  min-block-size: var(--state-min-height);
+}
+
+.loading {
+  padding-block: var(--space-16);
+}
+
+.ok {
+  display: grid;
+  align-content: start;
+  gap: var(--space-8);
+  padding-block: var(--space-16);
+  transition: var(--transition-fade);
+}
+
+.ok[data-stale="true"] {
+  opacity: var(--opacity-stale);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-weight: var(--weight-medium);
+}
+
+.success {
+  color: var(--status-success);
+}
+
+.checked {
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+  font-variant-numeric: var(--font-numeric);
+}

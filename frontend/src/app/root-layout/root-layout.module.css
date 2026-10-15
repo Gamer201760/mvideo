@@ -1,0 +1,37 @@
+.shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 100dvh;
+}
+
+.skip {
+  composes: controlText from "../../shared/styles/compose.module.css";
+  position: fixed;
+  inset-block-start: var(--space-8);
+  inset-inline-start: var(--space-8);
+  z-index: var(--layer-skip-link);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min);
+  padding-inline: var(--space-16);
+  border-radius: var(--radius-md);
+  background-color: var(--action-primary);
+  color: var(--action-primary-text);
+  transform: translateY(calc(-100% - var(--space-16)));
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+.main {
+  min-inline-size: 0;
+  padding: var(--space-page);
+  outline: none;
+}
+
+@media (min-width: 75rem) {
+  .main {
+    padding: var(--space-page-wide);
+  }
+}

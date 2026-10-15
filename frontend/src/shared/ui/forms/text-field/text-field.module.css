@@ -1,0 +1,36 @@
+.field {
+  display: grid;
+  gap: var(--space-8);
+  min-inline-size: 0;
+}
+
+.label {
+  composes: labelText from "../../../styles/compose.module.css";
+  color: var(--text-secondary);
+}
+
+.control {
+  composes: fieldSurface from "../../../styles/compose.module.css";
+  inline-size: 100%;
+  min-block-size: var(--target-min);
+  padding-block: var(--space-8);
+  border: 0;
+  resize: vertical;
+}
+
+.control::placeholder {
+  color: var(--text-muted);
+}
+
+.control:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.mono {
+  composes: monoText from "../../../styles/compose.module.css";
+}
+
+.hint {
+  composes: secondaryText from "../../../styles/compose.module.css";
+}

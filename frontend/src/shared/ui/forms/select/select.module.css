@@ -1,0 +1,97 @@
+.select {
+  position: relative;
+  display: grid;
+  gap: var(--space-8);
+  min-inline-size: 0;
+}
+
+.label {
+  composes: labelText from "../../../styles/compose.module.css";
+  color: var(--text-secondary);
+}
+
+.trigger {
+  composes: pressable fieldSurface from "../../../styles/compose.module.css";
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  text-align: start;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .trigger:hover {
+    background-color: var(--surface-raised-hover);
+  }
+}
+
+.trigger:active {
+  scale: var(--press-scale-surface);
+}
+
+.value {
+  composes: truncate from "../../../styles/compose.module.css";
+}
+
+.value[data-placeholder="true"] {
+  color: var(--text-muted);
+}
+
+.chevron {
+  flex: none;
+  color: var(--text-secondary);
+}
+
+.list {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-4));
+  inset-inline: 0;
+  z-index: var(--layer-popover);
+  display: grid;
+  max-block-size: calc(var(--control-height) * 8);
+  margin: 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+  list-style: none;
+  transform-origin: top center;
+  animation: var(--motion-scale-in);
+}
+
+.list[data-state="closed"] {
+  animation: var(--motion-scale-out);
+}
+
+.option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-8);
+  min-block-size: var(--target-min);
+  padding-inline: var(--space-12);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.option[data-active="true"] {
+  background-color: var(--surface-selected);
+}
+
+.optionLabel {
+  composes: truncate from "../../../styles/compose.module.css";
+}
+
+.hint {
+  composes: secondaryText from "../../../styles/compose.module.css";
+  white-space: nowrap;
+}
+
+.check {
+  color: var(--text-accent);
+}

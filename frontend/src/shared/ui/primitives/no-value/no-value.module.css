@@ -1,0 +1,4 @@
+.none {
+  color: var(--text-muted);
+  font-variant-numeric: var(--font-numeric);
+}

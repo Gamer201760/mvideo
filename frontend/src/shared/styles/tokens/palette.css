@@ -1,0 +1,27 @@
+:root {
+  --neutral-0: #ffffff;
+  --neutral-50: #f6f6f7;
+  --neutral-100: #ececee;
+  --neutral-150: #e2e2e6;
+  --neutral-200: #d4d4d9;
+  --neutral-300: #b5b5bd;
+  --neutral-400: #8c8c96;
+  --neutral-500: #686872;
+  --neutral-600: #54545c;
+  --neutral-700: #3e3e45;
+  --neutral-800: #2b2b30;
+  --neutral-850: #222226;
+  --neutral-900: #1a1a1e;
+  --neutral-950: #121215;
+  --accent-200: #b9c6f7;
+  --accent-300: #93a6f2;
+  --accent-500: #3d5bd9;
+  --accent-600: #3149bd;
+  --accent-700: #273b9a;
+  --red-300: #f59a9a;
+  --red-600: #c4322f;
+  --green-300: #7fd1a0;
+  --green-700: #1d7a45;
+  --amber-300: #f2c46d;
+  --amber-700: #8f5a00;
+}

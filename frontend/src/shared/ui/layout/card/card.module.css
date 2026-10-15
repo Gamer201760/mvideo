@@ -1,0 +1,52 @@
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-16);
+  min-inline-size: 0;
+  padding: var(--space-card);
+  border: var(--hairline) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-raised);
+}
+
+.entering {
+  animation: var(--motion-rise-in);
+  animation-delay: calc(var(--i) * var(--stagger));
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-element);
+}
+
+.heading {
+  display: grid;
+  flex: 1 1 var(--term-min);
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.eyebrow {
+  composes: labelText from "../../../styles/compose.module.css";
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.title {
+  composes: subheadingText from "../../../styles/compose.module.css";
+}
+
+.description {
+  composes: secondaryText from "../../../styles/compose.module.css";
+  max-inline-size: var(--prose-measure);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}

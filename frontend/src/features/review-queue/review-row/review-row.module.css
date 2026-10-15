@@ -1,0 +1,55 @@
+.row {
+  display: grid;
+  gap: var(--space-8);
+  padding-block: var(--space-16);
+  border-block-start: var(--hairline) solid var(--border-subtle);
+  animation: var(--motion-rise-in);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-4) var(--space-12);
+}
+
+.attribute {
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.meta {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  font-variant-numeric: tabular-nums;
+}
+
+.value,
+.quote,
+.title {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.value {
+  color: var(--text-primary);
+}
+
+.quote {
+  composes: monoText from "../../../shared/styles/compose.module.css";
+  color: var(--text-muted);
+}
+
+.title {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+}
+
+.edit {
+  display: grid;
+  gap: var(--space-12);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}

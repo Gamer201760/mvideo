@@ -1,0 +1,29 @@
+{
+  "kind": {
+    "network": "No connection to the server. Check the network and try again.",
+    "auth": "Sign in to continue.",
+    "forbidden": "You have no access to this section.",
+    "notFound": "Nothing was found at this address.",
+    "conflict": "The data has changed in the meantime. Refresh it and try again.",
+    "validation": "Some fields are filled in incorrectly.",
+    "server": "The server did not respond. Try again in a minute.",
+    "unknown": "Something went wrong. Try again."
+  },
+  "api": {
+    "server_unavailable": "The server is unavailable right now. Try again in a minute.",
+    "network_unavailable": "No connection to the server. Check the network and try again.",
+    "stand_unavailable": "Stand data is not built yet. Run the stand-pack command and restart the backend.",
+    "unknown_category": "This category is not part of the stand data. Pick one from the list.",
+    "review_item_not_found": "This review item no longer exists. Refresh the queue.",
+    "review_already_resolved": "Someone has already resolved this item. Refresh the queue.",
+    "invalid_correction": "Enter the correct value before saving.",
+    "validation_error": "Some fields are filled in incorrectly. The title is required.",
+    "empty_text": "Nothing is left after removing markup and page chrome. Paste a product description.",
+    "text_index_missing": "The catalog index for plain text is not built. Run raw-extract index and restart the backend.",
+    "embeddings_failure": "The embedding service did not respond. Try again in a minute."
+  },
+  "boundary": {
+    "title": "The page failed to open",
+    "description": "Reload the page. If the error repeats, the details are in the browser console."
+  }
+}
