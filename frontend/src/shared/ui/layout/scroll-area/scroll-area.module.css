@@ -1,0 +1,5 @@
+.area {
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}

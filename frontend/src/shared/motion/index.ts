@@ -9,6 +9,7 @@ export {
 } from "./css-tokens"
 export { type StaggerStyle, staggerStyle } from "./stagger"
 export { Swap, type SwapPhase, type SwapProps } from "./swap/swap"
+export { ThreadLayer, type ThreadLayerProps } from "./thread-layer/thread-layer"
 export { type InputModality, useInputModality } from "./use-input-modality"
 export { useLatched } from "./use-latched"
 export {
@@ -18,6 +19,7 @@ export {
 } from "./use-loading-indicator"
 export { type Presence, type PresenceState, usePresence } from "./use-presence"
 export { prefersReducedMotion, useReducedMotion } from "./use-reduced-motion"
+export { useReorderMotion } from "./use-reorder-motion"
 export {
   type RadiusToken,
   type SlidingIndicator,

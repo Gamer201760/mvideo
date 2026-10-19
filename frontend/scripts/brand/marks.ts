@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import type { ThemeName } from "../checks/themes.ts"
 import { readTokenSources, themeColor } from "../tokenSources.ts"
@@ -10,6 +10,7 @@ export interface ThemePalette {
   readonly raised: string
   readonly muted: string
   readonly line: string
+  readonly shell: string
 }
 
 export type BrandPalette = Readonly<Record<ThemeName, ThemePalette>>
@@ -20,20 +21,32 @@ export interface Mark {
 }
 
 const SVG = /<svg\b[^>]*\bviewBox="([^"]+)"[^>]*>([\s\S]*?)<\/svg>/
+const SHELL_MARK = /<template id="brand-mark">\s*([\s\S]*?)\s*<\/template>/
 
 const PALETTE_TOKENS: Readonly<Record<keyof ThemePalette, string>> = {
   base: "--text-primary",
-  accent: "--action-primary",
+  accent: "--mark-thread",
   surface: "--surface-base",
   raised: "--surface-raised",
   muted: "--text-secondary",
   line: "--border-subtle",
+  shell: "--surface-shell",
 }
 
-export function readMark(frontendRoot: string): Mark {
-  const svg = readFileSync(join(frontendRoot, "brand", "mark.svg"), "utf8")
+export function readMark(repoRoot: string): Mark {
+  const localSymbol = join(repoRoot, "frontend", "brand", "mark.svg")
+  const symbol = existsSync(localSymbol)
+    ? localSymbol
+    : join(repoRoot, "docs", "brand", "symbol.svg")
+  const shell = join(repoRoot, "presentation", "src", "shell.html")
+  const svg = existsSync(symbol)
+    ? readFileSync(symbol, "utf8")
+    : (SHELL_MARK.exec(readFileSync(shell, "utf8"))?.[1] ?? "")
   const match = SVG.exec(svg)
-  if (match === null) throw new Error("brand mark not found: brand/mark.svg")
+  if (match === null)
+    throw new Error(
+      "brand mark not found: docs/brand/symbol.svg or brand-mark in presentation/src/shell.html",
+    )
   return { viewBox: match[1] ?? "0 0 32 32", body: (match[2] ?? "").trim() }
 }
 

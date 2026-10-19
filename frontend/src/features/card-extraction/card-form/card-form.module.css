@@ -4,5 +4,63 @@
 
 .form {
   display: grid;
+  grid-template-areas: "title" "description" "example" "details" "submit";
+  align-items: start;
   gap: var(--space-16);
+}
+
+.example {
+  grid-area: example;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.title {
+  grid-area: title;
+}
+
+.description {
+  grid-area: description;
+}
+
+.details {
+  grid-area: details;
+}
+
+.field {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+}
+
+.label {
+  composes: labelText from "../../../shared/styles/compose.module.css";
+  color: var(--text-secondary);
+}
+
+.submit {
+  grid-area: submit;
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12);
+}
+
+.shortcut {
+  composes: captionText from "../../../shared/styles/compose.module.css";
+  font-family: var(--font-mono);
+}
+
+@media (hover: none) {
+  .shortcut {
+    display: none;
+  }
 }

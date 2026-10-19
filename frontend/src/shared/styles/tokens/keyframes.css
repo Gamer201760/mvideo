@@ -63,3 +63,142 @@
     opacity: 0.6;
   }
 }
+
+@keyframes kf-brand-thread {
+  40% {
+    transform: scaleX(var(--pluck-scale));
+  }
+}
+
+@keyframes kf-brand-knot {
+  40% {
+    transform: translateX(var(--pluck-shift)) scale(var(--pulse-scale));
+  }
+}
+
+@keyframes kf-brand-hop {
+  35% {
+    transform: translateY(var(--shift-hop));
+  }
+  62% {
+    transform: translateY(0);
+  }
+  80% {
+    transform: translateY(calc(var(--shift-hop) * 0.3));
+  }
+}
+
+@keyframes kf-reveal {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes kf-conceal {
+  to {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes kf-thread-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes kf-stage-out {
+  to {
+    opacity: 0;
+    filter: blur(var(--blur-soft));
+    transform: translateY(calc(var(--shift-stage) * -1)) scale(var(--stage-scale));
+  }
+}
+
+@keyframes kf-stage-in {
+  from {
+    opacity: 0;
+    filter: blur(var(--blur-soft));
+    transform: translateY(var(--shift-stage)) scale(var(--stage-scale));
+  }
+}
+
+@keyframes kf-scan {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(calc(100% / var(--scan-ratio)));
+  }
+}
+
+@keyframes kf-flow-highlight {
+  0%,
+  5%,
+  100% {
+    opacity: 0;
+  }
+  18%,
+  88% {
+    opacity: 1;
+  }
+}
+
+@keyframes kf-flow-thread {
+  0%,
+  18% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  46%,
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes kf-flow-values {
+  0%,
+  38%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  65%,
+  88% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+}
+
+@keyframes kf-flow-paper {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--shift-anchor) * -1));
+  }
+}
+
+@keyframes kf-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--shift-stage));
+  }
+}
+
+@keyframes kf-drawer-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--shift-stage));
+  }
+}

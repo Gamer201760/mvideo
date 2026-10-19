@@ -1,0 +1,88 @@
+name: ${COMPOSE_PROJECT_NAME:-mvideo}
+
+x-runtime: &runtime
+  image: ${COMPOSE_PROJECT_NAME:-mvideo}-backend:local
+  pull_policy: never
+  environment:
+    DATABASE_PATH: /data/app.db
+    GATEWAY_URL: ${GATEWAY_URL:-https://ai.goatwhistle.ru/v1}
+    GATEWAY_API_KEY: ${GATEWAY_API_KEY:-}
+    GATEWAY_TIMEOUT_S: ${GATEWAY_TIMEOUT_S:-120}
+    RULES_FIRST: ${RULES_FIRST:-true}
+    EXTRACTION_BATCH_SIZE: ${EXTRACTION_BATCH_SIZE:-4}
+    EXTRACTION_CONCURRENCY: ${EXTRACTION_CONCURRENCY:-2}
+    EXTRACTION_MAX_BATCH_CHARS: ${EXTRACTION_MAX_BATCH_CHARS:-48000}
+    EXTRACTION_MAX_PENDING: ${EXTRACTION_MAX_PENDING:-8}
+    ACCEPTANCE_THRESHOLD: ${ACCEPTANCE_THRESHOLD:-0.95}
+    AUTO_ACCEPT: ${AUTO_ACCEPT:-true}
+  volumes:
+    - state:/data
+
+services:
+  init:
+    <<: *runtime
+    user: root
+    command: ["python", "-c", "import os; os.chown('/data', 1000, 1000)"]
+
+  migrate:
+    image: ghcr.io/amacneil/dbmate:2.36.0
+    user: "1000:1000"
+    environment:
+      DATABASE_URL: sqlite:/data/app.db
+      DBMATE_MIGRATIONS_DIR: /migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+      DBMATE_STRICT: "true"
+    volumes:
+      - state:/data
+      - ./backend/migrations/sqlite:/migrations:ro
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    command: ["up"]
+
+  seed:
+    <<: *runtime
+    command: ["python", "-m", "app.seed"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  backend:
+    <<: *runtime
+    build:
+      context: backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/ready', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    mem_limit: 1g
+    cpus: 2
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: frontend
+    environment:
+      API_UPSTREAM: http://backend:8000
+      BATCH_PROXY_TIMEOUT_S: ${BATCH_PROXY_TIMEOUT_S:-1800}
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    mem_limit: 128m
+    restart: unless-stopped
+
+volumes:
+  state:

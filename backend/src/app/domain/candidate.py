@@ -50,8 +50,9 @@ class SellerRange:
 
 def is_range(value: str) -> bool:
     text = match_form(value)
-    return bool(RANGE_PAIR.search(text) or RANGE_WORDS_OPEN.search(text)
-                or RANGE_WORDS_CLOSED.search(text))
+    return bool(
+        RANGE_PAIR.search(text) or RANGE_WORDS_OPEN.search(text) or RANGE_WORDS_CLOSED.search(text)
+    )
 
 
 def parse_range(value: str) -> SellerRange | None:
@@ -69,7 +70,7 @@ def parse_range(value: str) -> SellerRange | None:
 
 
 def nearby_affinity(card: CardText, profile: AttributeProfile, start: int) -> float:
-    window = card.match[max(0, start - NEAR_WINDOW):start]
+    window = card.match[max(0, start - NEAR_WINDOW) : start]
     if not profile.keywords:
         return 0.0
     stems = {w[:STEM] for w in NEAR_WORD.findall(window) if len(w) >= 3}
@@ -80,7 +81,9 @@ def name_affinity(profile: AttributeProfile, key: str) -> float:
     return name_similarity(profile.keywords, key)
 
 
-def best_attributes(profiles: Mapping[str, AttributeProfile], key: str, minimum: float) -> list[str]:
+def best_attributes(
+    profiles: Mapping[str, AttributeProfile], key: str, minimum: float
+) -> list[str]:
     scored = [(name_affinity(p, key), n) for n, p in profiles.items()]
     top = max((s for s, _ in scored), default=0.0)
     if top < minimum:

@@ -1,0 +1,37 @@
+.list {
+  composes: plainList from "../../shared/styles/compose.module.css";
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  padding-block: var(--space-16);
+  border-block-start: var(--hairline) solid var(--border-subtle);
+}
+
+.subject {
+  flex: 1 1 100%;
+  min-inline-size: 0;
+}
+
+.title {
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  composes: secondaryText from "../../shared/styles/compose.module.css";
+}
+
+.pages {
+  display: flex;
+  gap: var(--space-12);
+}
+
+@media (min-width: 48rem) {
+  .subject {
+    flex-basis: 0;
+  }
+}

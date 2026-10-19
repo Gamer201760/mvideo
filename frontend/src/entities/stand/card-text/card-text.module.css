@@ -9,18 +9,21 @@
 .mark {
   padding-inline: var(--space-2);
   border-radius: var(--radius-sm);
-  background-color: var(--surface-selected);
+  background-color: transparent;
   color: var(--text-primary);
   text-decoration: underline;
-  text-decoration-color: var(--status-success);
+  text-decoration-color: var(--border-control);
+  text-decoration-thickness: var(--hairline);
   text-underline-offset: var(--space-4);
+  box-decoration-break: clone;
 }
 
 .mark[data-status="review"] {
   text-decoration-style: dashed;
-  text-decoration-color: var(--status-warning);
+  text-decoration-color: var(--status-attention);
 }
 
 .mark[data-active="true"] {
-  outline: var(--focus-ring-width) solid var(--focus-ring);
+  background-color: var(--surface-evidence);
+  text-decoration-color: var(--mark-thread);
 }

@@ -1,0 +1,20 @@
+.selection {
+  padding-block-end: var(--space-16);
+  border-block-end: var(--hairline) solid var(--border-subtle);
+}
+
+.attribute {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  margin: 0;
+}
+
+.value {
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+  margin-block: var(--space-4) 0;
+}
+
+.source {
+  flex: 1;
+  padding: var(--space-4);
+}

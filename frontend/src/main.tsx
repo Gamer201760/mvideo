@@ -1,4 +1,4 @@
-import "@fontsource-variable/inter"
+import "@fontsource-variable/onest"
 import "@fontsource-variable/jetbrains-mono"
 import "./shared/styles/global.css"
 import { StrictMode } from "react"

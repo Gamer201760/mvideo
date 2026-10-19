@@ -34,3 +34,25 @@
 .hint {
   composes: secondaryText from "../../../styles/compose.module.css";
 }
+
+.error {
+  color: var(--text-danger);
+}
+
+.control[aria-invalid="true"]:not(:focus-visible) {
+  outline: var(--hairline) solid var(--text-danger);
+}
+
+.inline .control {
+  padding-inline: 0;
+  border-block-end: var(--hairline) solid var(--border-control);
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.inline .control:focus-visible {
+  border-block-end-width: var(--focus-ring-width);
+  border-block-end-color: var(--focus-ring);
+  outline: none;
+}

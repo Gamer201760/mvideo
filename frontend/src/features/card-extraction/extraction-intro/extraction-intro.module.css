@@ -1,0 +1,9 @@
+.intro {
+  min-inline-size: 0;
+}
+
+@media (min-width: 64rem) {
+  .intro {
+    padding-block-start: var(--space-24);
+  }
+}

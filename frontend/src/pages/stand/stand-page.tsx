@@ -1,37 +1,27 @@
-import { useState } from "react"
 import { CardExtraction } from "@/features/card-extraction"
-import { ReviewQueue } from "@/features/review-queue"
-import { TextExtraction } from "@/features/text-extraction"
+import { ExportCard } from "@/features/export-card"
+import { RunHistory } from "@/features/run-history"
 import { useDocumentTitle, useTranslation } from "@/shared/i18n"
-import { PageHeader, Segmented } from "@/shared/ui"
+import { PageHeader } from "@/shared/ui"
 import styles from "./stand-page.module.css"
-
-type Mode = "card" | "text"
 
 export function StandPage() {
   const { t } = useTranslation()
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [mode, setMode] = useState<Mode>("card")
   useDocumentTitle(null)
-  const queue = <ReviewQueue onResolved={() => setRefreshKey((key) => key + 1)} />
   return (
     <div className={styles.page}>
-      <PageHeader title={t("stand:title")} description={t("stand:description")} />
-      <Segmented
-        label={t("stand:mode.label")}
-        value={mode}
-        onChange={setMode}
-        options={[
-          { value: "card", label: t("stand:mode.card") },
-          { value: "text", label: t("stand:mode.text") },
-        ]}
-        className={styles.mode}
+      <div className="visually-hidden">
+        <PageHeader title={t("stand:title")} />
+      </div>
+      <CardExtraction
+        exportSlot={(input, result) => <ExportCard source={{ input, result }} />}
+        historySlot={(onOpen) => (
+          <RunHistory
+            onOpen={onOpen}
+            exportSlot={(run) => <ExportCard source={{ runId: run.id }} compact />}
+          />
+        )}
       />
-      {mode === "card" ? (
-        <CardExtraction refreshKey={refreshKey} sideSlot={queue} />
-      ) : (
-        <TextExtraction refreshKey={refreshKey} sideSlot={queue} />
-      )}
     </div>
   )
 }

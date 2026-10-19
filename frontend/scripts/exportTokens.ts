@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url"
 import { readTokenSources, TOKEN_FILES, type TokenSource } from "./tokenSources.ts"
 
 export const FONT_PACKAGES = [
-  "@fontsource-variable/inter",
+  "@fontsource-variable/onest",
   "@fontsource-variable/jetbrains-mono",
 ] as const
 

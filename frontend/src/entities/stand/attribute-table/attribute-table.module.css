@@ -1,7 +1,5 @@
 .table {
-  inline-size: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-body-sm);
+  composes: dataTable from "../../../shared/styles/compose.module.css";
   line-height: var(--line-height-body-sm);
 }
 
@@ -15,45 +13,81 @@
 
 .row {
   border-block-start: var(--hairline) solid var(--border-subtle);
+  outline: none;
+  cursor: default;
 }
 
 .row > * {
   padding: var(--space-12);
   text-align: start;
-  vertical-align: top;
+  vertical-align: middle;
+}
+
+.group[data-active="true"] {
+  background-color: var(--surface-base);
+}
+
+.row:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: calc(var(--focus-ring-width) * -1);
 }
 
 .attribute {
+  inline-size: 20%;
   color: var(--text-secondary);
   font-weight: var(--weight-regular);
+  overflow-wrap: anywhere;
 }
 
 .value {
+  inline-size: 15%;
   color: var(--text-primary);
   font-weight: var(--weight-semibold);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .confidence {
+  inline-size: 40%;
+}
+
+.detailRow > td {
+  padding: 0 var(--space-12) var(--space-12);
+}
+
+.toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--space-4) var(--space-8);
 }
 
-.number {
-  min-inline-size: var(--space-40);
-  font-variant-numeric: tabular-nums;
+.details {
+  padding-block: var(--space-8);
 }
 
-.source {
-  color: var(--text-secondary);
+.reasonToggle {
+  composes: iconOnlyAction from "../../../shared/styles/compose.module.css";
+}
+
+.evidence {
+  min-inline-size: 0;
 }
 
 .quote {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
+  display: block;
+  color: var(--text-secondary);
   overflow-wrap: anywhere;
+}
+
+.evidence .quoteButton {
+  grid-template-columns: minmax(0, 1fr);
+  min-block-size: var(--control-height);
+  min-inline-size: 0;
+  inline-size: 100%;
+  padding-block: var(--space-8);
+  justify-items: start;
+  text-align: start;
+  white-space: normal;
 }
 
 @media (max-width: 48rem) {
@@ -63,21 +97,23 @@
 
   .row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-4) var(--space-12);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-8) var(--space-12);
     padding-block: var(--space-12);
   }
 
   .row > * {
+    inline-size: auto;
     padding: 0;
   }
 
-  .value,
-  .quote {
+  .confidence,
+  .evidence {
     grid-column: 1 / -1;
   }
 
-  .confidence {
-    grid-column: 1 / -1;
+  .detailRow > td {
+    display: block;
+    padding-inline: 0;
   }
 }

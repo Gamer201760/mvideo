@@ -16,7 +16,7 @@ def test_color_forms_collapse_to_base(raw: str, expected: str) -> None:
 
 
 def test_memory_units_normalize() -> None:
-    assert canonical_key("256Гб", None, True) == canonical_key("256 ГБ", None, True) == "256"
+    assert canonical_key("256Гб", None, True) == canonical_key("256 ГБ", None, True) == "256 гб"
     quantity = leading_quantity("256GB")
     assert quantity is not None and quantity.unit == "гб"
 
@@ -25,7 +25,7 @@ def test_diagonal_with_comma_and_inch_mark() -> None:
     quantity = leading_quantity('6,7"')
     assert quantity is not None
     assert (quantity.number, quantity.unit) == (6.7, '"')
-    assert canonical_key('6,7"', None, True) == canonical_key("6.70", '"', True) == "6.7"
+    assert canonical_key('6,7"', None, True) == canonical_key("6.70", '"', True) == "170.18 мм"
 
 
 def test_non_unit_suffix_is_not_quantity() -> None:

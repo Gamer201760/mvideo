@@ -5,15 +5,18 @@ import { chromium, type Page } from "@playwright/test"
 import { ICO_SIZES, type Locale, MANIFEST, META_LOCALE, ogFile, RASTERS } from "./brand/assets.ts"
 import { buildIco, type PngImage } from "./brand/binary.ts"
 import { faviconSvg, paintedMark, readMark, readPalette } from "./brand/marks.ts"
-import { cardHtml, rasterHtml, tileHtml } from "./brand/pages.ts"
+import { type CardArt, cardHtml, rasterHtml, tileHtml } from "./brand/pages.ts"
 import { FONT_PACKAGES, pickFontFaces } from "./exportTokens.ts"
 
 interface CommonWords {
   readonly app: { readonly name: string; readonly tagline: string }
   readonly meta: { readonly description: string }
+  readonly shell: { readonly for: string }
+  readonly brand: { readonly cardValue: string; readonly cardQuote: string }
 }
 
 const frontendRoot = resolve(fileURLToPath(new URL("..", import.meta.url)))
+const repoRoot = resolve(frontendRoot, "..")
 const publicDir = join(frontendRoot, "public")
 const LOCALES: readonly Locale[] = ["ru", "en"]
 
@@ -53,9 +56,14 @@ async function shoot(page: Page, html: string): Promise<Buffer> {
   return page.locator("#asset").screenshot({ omitBackground: true })
 }
 
-const mark = readMark(frontendRoot)
+const mark = readMark(repoRoot)
 const palette = readPalette(frontendRoot)
-const light = paintedMark(mark, palette.light)
+const onShell = paintedMark(mark, palette.dark)
+const shellTile = { ...palette.dark, raised: palette.light.shell, surface: palette.light.shell }
+const partnerLogo = readFileSync(
+  join(frontendRoot, "src", "shared", "ui", "brand-logos", "mvideo.default.svg"),
+  "utf8",
+).replace("<svg ", '<svg height="100%" ')
 const site = process.env.SITE_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ?? ""
 
 write("favicon.svg", faviconSvg(mark, palette))
@@ -64,10 +72,10 @@ const browser = await chromium.launch()
 const page = await browser.newPage({ deviceScaleFactor: 1 })
 const ico: PngImage[] = []
 for (const size of ICO_SIZES)
-  ico.push({ size, data: await shoot(page, tileHtml(light, size, palette.light, true, 0.78)) })
+  ico.push({ size, data: await shoot(page, tileHtml(onShell, size, shellTile, true, 0.78)) })
 write("favicon.ico", buildIco(ico))
 for (const asset of RASTERS)
-  write(asset.file, await shoot(page, rasterHtml(light, asset, palette.light)))
+  write(asset.file, await shoot(page, rasterHtml(onShell, asset, shellTile)))
 const fonts = fontFaces()
 const family = fontFamily()
 for (const locale of LOCALES) {
@@ -76,9 +84,19 @@ for (const locale of LOCALES) {
     name: text.app.name,
     tagline: text.app.tagline,
     description: text.meta.description,
-    site: site || text.app.name,
+    site,
   }
-  write(ogFile(locale), await shoot(page, cardHtml(light, card, palette.light, fonts, family)))
+  const art: CardArt = {
+    mark: onShell,
+    partner: partnerLogo,
+    prefix: text.shell.for,
+    value: text.brand.cardValue,
+    quote: text.brand.cardQuote,
+  }
+  write(
+    ogFile(locale),
+    await shoot(page, cardHtml(art, card, palette.light, palette.dark, fonts, family)),
+  )
 }
 await browser.close()
 
@@ -91,8 +109,8 @@ const manifest = {
   start_url: "/",
   scope: "/",
   display: "standalone",
-  background_color: palette.light.surface,
-  theme_color: palette.light.surface,
+  background_color: palette.light.shell,
+  theme_color: palette.light.shell,
   icons: RASTERS.filter((asset) => asset.file.startsWith("icons/")).map((asset) => ({
     src: `/${asset.file}`,
     sizes: `${asset.size}x${asset.size}`,

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-19",
+  "evaluation": "exploratory offline replay on previously used 120-card sample",
+  "policies": [
+    {
+      "name": "complete",
+      "min_coverage": 1.0
+    },
+    {
+      "name": "three_quarters",
+      "min_coverage": 0.75
+    },
+    {
+      "name": "half",
+      "min_coverage": 0.5
+    }
+  ],
+  "common": {
+    "min_category_score": 0.35,
+    "min_category_margin": 0.1,
+    "min_supported_fields": 2,
+    "require_valid_evidence": true,
+    "require_no_risk_warnings": true
+  },
+  "deployment_rule": "Only the complete policy is eligible for runtime activation; require at least one saved call and no observed loss of precision, recall or F1 against replayed hybrid. Partial policies are diagnostic only.",
+  "latency": "Reconstructed from current local replay time plus original saved gateway call durations; no new network latency measurement.",
+  "data": "data/benchmarks/release-v1; gold is only used by the evaluator after routing."
+}

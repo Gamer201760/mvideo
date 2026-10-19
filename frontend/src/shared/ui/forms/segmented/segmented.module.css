@@ -4,7 +4,7 @@
   align-items: stretch;
   gap: var(--space-2);
   padding: var(--space-2);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-pill);
   background-color: var(--surface-sunken);
 }
 
@@ -29,7 +29,7 @@
   min-inline-size: var(--target-min);
   min-block-size: var(--control-height-compact);
   padding-inline: var(--space-12);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   color: var(--text-secondary);
   cursor: pointer;
 }
@@ -67,4 +67,36 @@
   opacity: 0;
   cursor: inherit;
   appearance: none;
+}
+
+.inverse {
+  --focus-ring: var(--text-on-shell);
+  background-color: var(--shell-track);
+}
+
+.inverse .indicator {
+  background-color: var(--shell-thumb);
+  box-shadow: none;
+}
+
+.inverse .option {
+  color: var(--text-on-shell-muted);
+}
+
+.inverse .option[data-checked="true"] {
+  color: var(--shell-thumb-text);
+}
+
+.inverse .option[data-checked="false"] > span {
+  background-color: var(--shell-track);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .inverse .option:hover {
+    color: var(--text-on-shell);
+  }
+
+  .inverse .option[data-checked="true"]:hover {
+    color: var(--shell-thumb-text);
+  }
 }

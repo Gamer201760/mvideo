@@ -1,13 +1,13 @@
 {
-  "name": "Продукт",
-  "short_name": "Продукт",
-  "description": "Каркас интерфейса продукта: оболочка, темы, языки и общие состояния.",
+  "name": "Admit",
+  "short_name": "Admit",
+  "description": "Заполняет характеристики товара по тексту карточки продавца. У каждого значения есть цитата, уверенность и источник, спорное решает человек.",
   "lang": "ru",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f6f6f7",
-  "theme_color": "#f6f6f7",
+  "background_color": "#1d1e1f",
+  "theme_color": "#1d1e1f",
   "icons": [
     {
       "src": "/icons/icon-192.png",

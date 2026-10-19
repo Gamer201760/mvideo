@@ -1,0 +1,429 @@
+{
+  "synthetic": true,
+  "categories": [
+    {
+      "category_id": 761,
+      "path": "Электроника / Телефоны / Смартфоны",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Модель",
+          "kind": "free",
+          "unit": "",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Встроенная память (ROM)",
+          "kind": "numeric",
+          "unit": "ГБ",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Диагональ",
+          "kind": "numeric",
+          "unit": "\"",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Емкость аккумулятора",
+          "kind": "numeric",
+          "unit": "мАч",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 987,
+      "path": "Электроника / Компьютеры / Ноутбуки",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Процессор",
+          "kind": "free",
+          "unit": "",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Оперативная память (RAM)",
+          "kind": "numeric",
+          "unit": "ГБ",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Общий объем накопителя",
+          "kind": "numeric",
+          "unit": "ГБ",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Диагональ экрана",
+          "kind": "numeric",
+          "unit": "\"",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1001,
+      "path": "Бытовая техника / Кухня / Чайники",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Объем",
+          "kind": "numeric",
+          "unit": "л",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Мощность",
+          "kind": "numeric",
+          "unit": "Вт",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Материал корпуса",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "сталь",
+            "пластик",
+            "алюминий"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1002,
+      "path": "Бытовая техника / Кухня / Вытяжки кухонные",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Мощность",
+          "kind": "numeric",
+          "unit": "Вт",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Уровень шума",
+          "kind": "numeric",
+          "unit": "дБ",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1003,
+      "path": "Электроника / Аудио / Наушники",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Тип",
+          "kind": "free",
+          "unit": "",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Беспроводное подключение",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Bluetooth",
+            "Wi-Fi"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1004,
+      "path": "Бытовая техника / Уборка / Пылесосы",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Мощность",
+          "kind": "numeric",
+          "unit": "Вт",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Объем",
+          "kind": "numeric",
+          "unit": "л",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Вес",
+          "kind": "numeric",
+          "unit": "кг",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1005,
+      "path": "Дом / Мебель / Стулья",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Материал корпуса",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "сталь",
+            "пластик",
+            "алюминий"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Максимальная нагрузка",
+          "kind": "numeric",
+          "unit": "кг",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    },
+    {
+      "category_id": 1006,
+      "path": "Климатическая техника / Вентиляторы",
+      "score": 0,
+      "fields": [
+        {
+          "attribute": "Бренд",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "Север",
+            "Вектор"
+          ],
+          "aliases": []
+        },
+        {
+          "attribute": "Мощность",
+          "kind": "numeric",
+          "unit": "Вт",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Количество скоростей",
+          "kind": "numeric",
+          "unit": "шт",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Уровень шума",
+          "kind": "numeric",
+          "unit": "дБ",
+          "values": [],
+          "aliases": []
+        },
+        {
+          "attribute": "Цвет",
+          "kind": "categorical",
+          "unit": "",
+          "values": [
+            "черный",
+            "белый",
+            "красный",
+            "синий"
+          ],
+          "aliases": []
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "sku_id": 1,
+      "category_id": 761,
+      "title": "Смартфон Север S1 256 ГБ",
+      "description": "Бренд: Север\nМодель: S1\nВстроенная память (ROM): 256 ГБ\nДиагональ: 6,5 дюйма\nЕмкость аккумулятора: 5000 мАч\nЦвет: черный",
+      "seller_params": []
+    },
+    {
+      "sku_id": 2,
+      "category_id": 987,
+      "title": "Ноутбук Вектор N2",
+      "description": "Бренд: Вектор\nПроцессор: Vega 4\nОперативная память (RAM): 16 ГБ\nОбщий объем накопителя: 512 ГБ\nДиагональ экрана: 15,6 дюйма\nЦвет: белый",
+      "seller_params": []
+    },
+    {
+      "sku_id": 3,
+      "category_id": 1001,
+      "title": "Чайник Север K3",
+      "description": "Бренд: Север\nОбъем: 1,7 л\nМощность: 2000 Вт\nМатериал корпуса: сталь\nЦвет: черный",
+      "seller_params": []
+    },
+    {
+      "sku_id": 4,
+      "category_id": 1004,
+      "title": "Пылесос Вектор P4",
+      "description": "Бренд: Вектор\nВес: 500 г\nМощность: 300 Вт\nОбъем: 1200 мл\nЦвет: синий",
+      "seller_params": []
+    }
+  ]
+}

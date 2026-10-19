@@ -13,6 +13,8 @@ export function RootError() {
   return (
     <main className={styles.page}>
       <ErrorState
+        layout="page"
+        titleAs="h1"
         title={t("errors:boundary.title")}
         description={t("errors:boundary.description")}
         onRetry={() => window.location.reload()}

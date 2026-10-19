@@ -1,0 +1,77 @@
+{
+  "version": "organizer-dataset-v1",
+  "created_at": "2026-10-19T08:37:42.563974+00:00",
+  "sources": {
+    "sku_desc.parquet": {
+      "sha256": "08af4442a87dd2d0e50d80aae4371b12d72d9f82adfeffeca3c0fff5595bc67d",
+      "bytes": 352149681
+    },
+    "query_clicks.parquet": {
+      "sha256": "f9bc052dd55cae6e178324da004f1924f2c9dbc6f8a10e51319767aca107bb22",
+      "bytes": 650887879
+    },
+    "skus.pkl": {
+      "sha256": "7dd8da31382016c770877e16fbcce565e29e479ad6a6317f0a7e683a09eb3524",
+      "bytes": 1565150311
+    }
+  },
+  "outputs": {
+    "cards.parquet": {
+      "sha256": "ad2f7a94535fac5f9e10474d2009ec26006974ed8c61514523d5c42713a0a2d0",
+      "rows": 1481914,
+      "bytes": 801583273
+    },
+    "categories.parquet": {
+      "sha256": "d37b49b183ad01221634c7b81b08114cabc1ef754f4cf8bcd7682ce7e188826a",
+      "rows": 6963,
+      "bytes": 477832
+    },
+    "clicks_category.parquet": {
+      "sha256": "69b15f1ca542da0c0f75faa7dfc725fef40c68ea42a7e3b9a8372f130e351f82",
+      "rows": 3599,
+      "bytes": 48057
+    },
+    "clicks_sku.parquet": {
+      "sha256": "3ef0aad23f4aabf1390eabc34aae87b678834ac986eb680b1d4c52efe3a0bfa2",
+      "rows": 332753,
+      "bytes": 2734493
+    },
+    "gold.parquet": {
+      "sha256": "0faecad4260f058d4cf9d7ed16420eeb515197b0584481f24ab644058de53f8e",
+      "rows": 15472688,
+      "bytes": 81748987
+    },
+    "required_attributes.parquet": {
+      "sha256": "ab7e2ff7be71344631aa5ba7c4a5ec312fcd343898a05d86f8ec082ce2105fc4",
+      "rows": 8297,
+      "bytes": 201030
+    },
+    "splits.parquet": {
+      "sha256": "fbe07aac485572b0253aeffb260a05eecc4389ad3ea4e456ebc78e0ed34b80b6",
+      "rows": 546069,
+      "bytes": 2601616
+    }
+  },
+  "configuration": {
+    "seed": 42,
+    "val_share": 0.1,
+    "test_share": 0.1,
+    "new_categories": 8,
+    "new_category_min_cards": 200,
+    "new_category_max_cards": 3000,
+    "protected_categories": [
+      "Смартфоны",
+      "Ноутбуки"
+    ],
+    "min_category_cards": 30,
+    "candidates_per_category": 40,
+    "top_n": 6,
+    "min_coverage": 0.3,
+    "values_per_attribute": 300
+  },
+  "threads": 2,
+  "peak_rss_mib": 4452.390625,
+  "gold_policy": "*_search plus catalog vendor/model; never copied into seller input",
+  "metadata_policy": "Required fields/weights use catalog and traffic metadata across splits; not claimed train-only",
+  "model_calls": 0
+}

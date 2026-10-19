@@ -27,14 +27,25 @@ export const TEXT_SURFACES = [
 ]
 export const ON_SURFACES: Readonly<Record<string, readonly string[]>> = {
   "--action-primary-text": ["--action-primary", "--action-primary-hover", "--action-primary-press"],
+  "--action-secondary-text": ["--action-secondary"],
+  "--text-on-shell": ["--surface-shell"],
+  "--text-on-shell-muted": ["--surface-shell", "--shell-track"],
+  "--shell-thumb-text": ["--shell-thumb"],
 }
 export const EXTRA_TEXT: ReadonlyArray<readonly [string, string]> = [
   ["--text-primary", "--surface-selected"],
+  ["--text-primary", "--surface-evidence"],
+  ["--text-attention", "--surface-evidence"],
 ]
 export const EXEMPT_TEXT = new Set(["--text-disabled"])
 const NON_TEXT: ReadonlyArray<readonly [string, string]> = [
   ["--focus-ring", "--surface-base"],
   ["--focus-ring", "--surface-raised"],
+  ["--border-control", "--surface-base"],
+  ["--border-control", "--surface-raised"],
+  ["--border-control", "--surface-sunken"],
+  ["--mark-thread", "--surface-base"],
+  ["--mark-thread", "--surface-raised"],
 ]
 const BLOCK = /([^{}]+)\{([^{}]*)\}/g
 const CUSTOM_PROPERTY = /(--[\w-]+)\s*:/g

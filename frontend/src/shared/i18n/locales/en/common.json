@@ -1,17 +1,21 @@
 {
   "app": {
-    "name": "Product attributes",
-    "tagline": "Attribute extraction with quotes"
+    "name": "Admit",
+    "tagline": "Into the catalogue only with a quote"
   },
   "meta": {
-    "description": "Extracts product attributes from a seller card: every value has a quote, a confidence and a review queue."
+    "description": "Fills product attributes from the seller's card text. Every value has a quote, a confidence and a source; a person decides the disputed ones."
   },
   "shell": {
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "for": "for",
+    "partner": "M.Video",
+    "home": "Admit, go to the start page"
   },
   "action": {
     "retry": "Try again",
-    "home": "Go to the start page"
+    "home": "Go to the start page",
+    "status": "Check the server"
   },
   "state": {
     "loading": "Loading"
@@ -37,5 +41,9 @@
   "notFound": {
     "title": "Page not found",
     "description": "The address may contain a typo, or the page has moved."
+  },
+  "brand": {
+    "cardValue": "6.7″",
+    "cardQuote": "“6.7-inch display”"
   }
 }

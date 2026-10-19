@@ -5,7 +5,7 @@ from app.domain.candidate import Candidate
 from app.domain.card_text import CardText, build_card_text
 from app.domain.extractors import extract_candidates
 from app.domain.lexicon import Lexicon
-from app.domain.profile import BRAND, TZ_REQUIRED, AttributeProfile
+from app.domain.profile import BRAND, TZ_REQUIRED, AttributeProfile, Kind, name_keywords
 from app.domain.scoring import Pick, candidate_score, pick_values
 from app.usecase.baseline_ports import (
     CandidateRow,
@@ -52,7 +52,10 @@ class RequiredAttributes:
 
     def profiles(self, category: int | None) -> dict[str, AttributeProfile]:
         known = self._lexicon.profiles
-        return {a: known[a] for a in self.weights(category) if a in known}
+        return {
+            a: known.get(a, AttributeProfile(a, Kind.FREE, "", name_keywords(a)))
+            for a in self.weights(category)
+        }
 
 
 def extract_card(
@@ -69,24 +72,50 @@ def extract_card(
 
 def _values(picks: Mapping[str, Pick]) -> tuple[PredictedValue, ...]:
     return tuple(
-        PredictedValue(name, p.candidate.value, p.confidence, p.candidate.source, p.sources,
-                       p.candidate.evidence, p.candidate.start, p.candidate.end)
+        PredictedValue(
+            name,
+            p.candidate.value,
+            p.confidence,
+            p.candidate.source,
+            p.sources,
+            p.candidate.evidence,
+            p.candidate.start,
+            p.candidate.end,
+        )
         for name, p in sorted(picks.items())
     )
 
 
 def prediction_of(card: CardRecord, extraction: CardExtraction) -> CardPrediction:
-    return CardPrediction(card.sku_id, card.category_id, card.split, _values(extraction.picks),
-                          _values(extraction.review))
+    return CardPrediction(
+        card.sku_id,
+        card.category_id,
+        card.split,
+        _values(extraction.picks),
+        _values(extraction.review),
+    )
 
 
 def candidate_rows(card: CardRecord, extraction: CardExtraction) -> list[CandidateRow]:
     picked = [*extraction.picks.items(), *extraction.review.items()]
     chosen = {(n, p.candidate.key) for n, p in picked}
     return [
-        CandidateRow(card.sku_id, c.attribute, c.key, c.value, c.evidence, c.start, c.end,
-                     c.source, c.zone, round(c.affinity, 4), c.prior, c.seller_fit, c.slot,
-                     round(candidate_score(c, extraction.profiles[c.attribute]), 4),
-                     (c.attribute, c.key) in chosen)
+        CandidateRow(
+            card.sku_id,
+            c.attribute,
+            c.key,
+            c.value,
+            c.evidence,
+            c.start,
+            c.end,
+            c.source,
+            c.zone,
+            round(c.affinity, 4),
+            c.prior,
+            c.seller_fit,
+            c.slot,
+            round(candidate_score(c, extraction.profiles[c.attribute]), 4),
+            (c.attribute, c.key) in chosen,
+        )
         for c in extraction.candidates
     ]

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 import {
   ICO_SIZES,
@@ -27,7 +27,7 @@ interface Manifest {
 
 describe("brand assets in public/", () => {
   it(`favicon.svg matches the current mark and tokens (${FIX})`, () => {
-    const expected = faviconSvg(readMark(ROOT), readPalette(ROOT))
+    const expected = faviconSvg(readMark(resolve(ROOT, "..")), readPalette(ROOT))
     expect(readFileSync(join(PUBLIC, "favicon.svg"), "utf8")).toBe(expected)
     expect(expected).toContain("prefers-color-scheme:dark")
   })

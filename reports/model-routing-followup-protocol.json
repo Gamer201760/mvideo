@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-19",
+  "evaluation": "exploratory offline replay with protection for unparsed product information",
+  "policies": [
+    {
+      "name": "schema_only",
+      "min_coverage": 1.0,
+      "require_covered_text": false
+    },
+    {
+      "name": "covered_text",
+      "min_coverage": 1.0,
+      "require_covered_text": true
+    }
+  ],
+  "common": {
+    "min_category_score": 0.35,
+    "min_category_margin": 0.1,
+    "min_supported_fields": 2,
+    "require_valid_evidence": true,
+    "require_no_risk_warnings": true
+  },
+  "deployment_rule": "Use covered_text in runtime. Schema-only coverage is insufficient if descriptions or extra fields remain unparsed. A new independent sample is required to estimate savings on real cards.",
+  "latency": "Reconstructed from current local replay time plus original saved gateway call durations; no new network latency measurement.",
+  "data": "data/benchmarks/release-v1; gold is only used by the evaluator after routing."
+}

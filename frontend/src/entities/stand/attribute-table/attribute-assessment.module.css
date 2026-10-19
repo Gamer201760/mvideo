@@ -1,0 +1,33 @@
+.assessment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+.scoreLine {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.score {
+  min-inline-size: var(--space-48);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.reasons {
+  composes: inlineList captionText from "../../../shared/styles/compose.module.css";
+  gap: var(--space-4) var(--space-16);
+  color: var(--text-secondary);
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 48rem) {
+  .meter {
+    display: none;
+  }
+}

@@ -6,27 +6,40 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException
 
-from app.domain.errors import DomainError, InvalidQuestion, ModelFailure
+from app.domain.errors import (
+    DomainError,
+    InvalidModelOutput,
+    InvalidQuestion,
+    ModelFailure,
+    ModelInputTooLarge,
+    ModelTimeout,
+    RunNotFound,
+)
 from app.domain.review import (
     InvalidCorrection,
+    InvalidReviewAttribute,
+    InvalidReviewEvidence,
     ReviewAlreadyResolved,
     ReviewItemNotFound,
     StandUnavailable,
     UnknownCategory,
 )
-from app.domain.text_reading import EmptyText, TextIndexMissing
 from app.usecase.interface import Logger
 
 STATUS_BY_ERROR: dict[type[DomainError], HTTPStatus] = {
+    RunNotFound: HTTPStatus.NOT_FOUND,
     InvalidQuestion: HTTPStatus.UNPROCESSABLE_ENTITY,
     ModelFailure: HTTPStatus.SERVICE_UNAVAILABLE,
+    ModelInputTooLarge: HTTPStatus.UNPROCESSABLE_ENTITY,
+    ModelTimeout: HTTPStatus.GATEWAY_TIMEOUT,
+    InvalidModelOutput: HTTPStatus.BAD_GATEWAY,
     ReviewItemNotFound: HTTPStatus.NOT_FOUND,
     ReviewAlreadyResolved: HTTPStatus.CONFLICT,
     InvalidCorrection: HTTPStatus.UNPROCESSABLE_ENTITY,
+    InvalidReviewAttribute: HTTPStatus.UNPROCESSABLE_ENTITY,
+    InvalidReviewEvidence: HTTPStatus.UNPROCESSABLE_ENTITY,
     UnknownCategory: HTTPStatus.UNPROCESSABLE_ENTITY,
     StandUnavailable: HTTPStatus.SERVICE_UNAVAILABLE,
-    EmptyText: HTTPStatus.UNPROCESSABLE_ENTITY,
-    TextIndexMissing: HTTPStatus.SERVICE_UNAVAILABLE,
 }
 
 

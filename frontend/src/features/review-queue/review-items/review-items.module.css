@@ -1,0 +1,3 @@
+.list {
+  composes: plainList from "../../../shared/styles/compose.module.css";
+}

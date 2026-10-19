@@ -2,8 +2,3 @@
   display: grid;
   gap: var(--space-section);
 }
-
-.mode {
-  justify-self: start;
-  max-inline-size: 100%;
-}

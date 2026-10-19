@@ -55,6 +55,13 @@
   --button-padding: var(--space-8);
 }
 
+.button.iconOnly {
+  --button-height: var(--target-min);
+  inline-size: var(--target-min);
+  min-inline-size: var(--target-min);
+  padding-inline: 0;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .button:hover:not(:disabled, [aria-disabled="true"]) {
     background-color: var(--button-surface-hover);
@@ -93,4 +100,8 @@
 
 .loader {
   animation: var(--motion-spin);
+}
+
+.iconOnly .content {
+  gap: 0;
 }

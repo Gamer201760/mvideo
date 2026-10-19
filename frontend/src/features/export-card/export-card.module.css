@@ -1,0 +1,6 @@
+.export {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-12);
+  min-inline-size: 0;
+}

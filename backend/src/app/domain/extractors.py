@@ -16,51 +16,67 @@ from app.domain.lexicon import Lexicon
 from app.domain.profile import BRAND, MODEL, AttributeProfile, Kind
 from app.domain.values import (
     NUMBER,
+    Quantity,
     canonical_text,
     canonical_unit,
     format_number,
     leading_quantity,
     parse_number,
+    quantity_in_unit,
 )
 
-UNIT = (
-    r"гб|gb|тб|tb|мб|mb|мач|mah|ма\*ч|мa\*ч|ма·ч|\"|”|″|''|дюйм[a-zа-я]*|inch|мм|mm|см|cm|"
-    r"кг|kg|гр|г|вт|w|квт|kw|л|литр[a-zа-я]*|мпикс|мп|mp|ггц|ghz|мгц|mhz|гц|hz|шт|дб|db"
+UNIT = r"[a-zа-я]+(?:[·*][a-zа-я]+)*(?:/[a-zа-я]+)?|[°*][a-zа-я]+|\"|”|″|''"
+QUANTITY = re.compile(rf"(?<![\w.,+−-])({NUMBER})[ \t-]*({UNIT})(?![\w/])")
+RANGE_QUANTITY = re.compile(rf"({NUMBER})[ \t-]*({UNIT})(?![\w/])")
+SLASH_MEMORY = re.compile(r"(?<![\w.,+−-])(\d+)\s*/\s*(\d+)\s*([a-zа-я]+)(?!\w)")
+KEY_VALUE = re.compile(
+    r"^[ \t]*[•\-–*]?[ \t]*([^:\n]{2,60}?)[ \t]*:[ \t]*([^\n]{1,120}?)[ \t]*$", re.MULTILINE
 )
-QUANTITY = re.compile(rf"(?<![\d.,])({NUMBER})[\s-]*({UNIT})(?![a-zа-я])")
-SLASH_MEMORY = re.compile(r"(?<![\d.,])(\d+)\s*/\s*(\d+)\s*(гб|gb|тб|tb)(?![a-zа-я])")
-KEY_VALUE = re.compile(r"^[ \t]*[•\-–*]?[ \t]*([^:\n]{2,60}?)[ \t]*:[ \t]*([^\n]{1,120}?)[ \t]*$",
-                       re.MULTILINE)
 MIN_AFFINITY = 0.5
 
 
 def unit_of(raw: str) -> str | None:
-    if raw.startswith("дюйм"):
-        return '"'
-    if raw.startswith("литр"):
-        return "л"
     return canonical_unit(raw)
+
+
+def range_in_unit(value: str, target: str) -> SellerRange | None:
+    parsed = parse_range(value)
+    if parsed is None or value.lstrip().startswith(("-", "−")):
+        return None
+    units = {
+        unit_of(m.group(2)) for m in RANGE_QUANTITY.finditer(value) if m.group(2) not in {"до", "и"}
+    }
+    if None in units or len(units) > 1:
+        return None
+    unit = next(iter(units), target)
+    if unit is None:
+        return None
+    low = quantity_in_unit(Quantity(parsed.low, unit), target)
+    high = quantity_in_unit(Quantity(parsed.high, unit), target)
+    return SellerRange(low.number, high.number) if low and high else None
 
 
 def seller_ranges(
     card: CardText, profiles: Mapping[str, AttributeProfile]
 ) -> dict[str, SellerRange]:
     ranges: dict[str, SellerRange] = {}
-    seller = card.text[card.seller_start:]
+    seller = card.match[card.seller_start :]
     for line in KEY_VALUE.finditer(seller):
         for name in best_attributes(profiles, line.group(1), MIN_AFFINITY):
             if profiles[name].numeric:
-                parsed = parse_range(line.group(2))
+                parsed = range_in_unit(line.group(2), profiles[name].unit)
                 if parsed is not None:
                     ranges.setdefault(name, parsed)
     return ranges
 
 
 def key_value_candidates(
-    card: CardText, profiles: Mapping[str, AttributeProfile], lexicon: Lexicon,
+    card: CardText,
+    profiles: Mapping[str, AttributeProfile],
+    lexicon: Lexicon,
     category: int | None,
 ) -> Iterator[Candidate]:
-    for line in KEY_VALUE.finditer(card.text):
+    for line in KEY_VALUE.finditer(card.match):
         key, value = line.group(1), line.group(2)
         start, end = line.start(2), line.end(2)
         zone = card.zone(line.start())
@@ -72,17 +88,33 @@ def key_value_candidates(
                 quantity = leading_quantity(value, profile.unit)
                 if quantity is None or is_range(value):
                     continue
-                canon = format_number(quantity.number)
+                converted = quantity_in_unit(quantity, profile.unit)
+                if converted is None:
+                    continue
+                canon = format_number(converted.number)
                 shown = f"{canon} {profile.unit}".strip()
             else:
                 canon = canonical_text(value)
-                shown = lexicon.display(name, canon) or value.strip()
-            yield Candidate(name, canon, shown, card.span(start, end), start, end, source, zone,
-                            affinity, lexicon.prior(category, name, canon), 0)
+                shown = lexicon.display(name, canon) or card.span(start, end).strip()
+            yield Candidate(
+                name,
+                canon,
+                shown,
+                card.span(start, end),
+                start,
+                end,
+                source,
+                zone,
+                affinity,
+                lexicon.prior(category, name, canon),
+                0,
+            )
 
 
 def dictionary_candidates(
-    card: CardText, profiles: Mapping[str, AttributeProfile], lexicon: Lexicon,
+    card: CardText,
+    profiles: Mapping[str, AttributeProfile],
+    lexicon: Lexicon,
     category: int | None,
 ) -> Iterator[Candidate]:
     attributes = frozenset(n for n, p in profiles.items() if not p.numeric)
@@ -91,15 +123,27 @@ def dictionary_candidates(
         end = card.tokens[found.last].end
         entry = found.entry
         profile = profiles[entry.attribute]
-        yield Candidate(entry.attribute, entry.key, entry.display, card.span(start, end), start,
-                        end, Source.DICTIONARY, card.zone(start),
-                        nearby_affinity(card, profile, start),
-                        lexicon.prior(category, entry.attribute, entry.key), 0)
+        yield Candidate(
+            entry.attribute,
+            entry.key,
+            entry.display,
+            card.span(start, end),
+            start,
+            end,
+            Source.DICTIONARY,
+            card.zone(start),
+            nearby_affinity(card, profile, start),
+            lexicon.prior(category, entry.attribute, entry.key),
+            0,
+        )
 
 
 def number_candidates(
-    card: CardText, profiles: Mapping[str, AttributeProfile], lexicon: Lexicon,
-    category: int | None, ranges: Mapping[str, SellerRange],
+    card: CardText,
+    profiles: Mapping[str, AttributeProfile],
+    lexicon: Lexicon,
+    category: int | None,
+    ranges: Mapping[str, SellerRange],
 ) -> Iterator[Candidate]:
     numeric = {n: p for n, p in profiles.items() if p.kind is Kind.NUMERIC and p.unit}
     if not numeric:
@@ -107,6 +151,8 @@ def number_candidates(
     spans: list[tuple[float, str, int, int, int]] = []
     for m in SLASH_MEMORY.finditer(card.match):
         unit = unit_of(m.group(3)) or ""
+        if unit not in {"гб", "мб", "тб"}:
+            continue
         spans.append((parse_number(m.group(1)), unit, m.start(1), m.end(1), 0))
         spans.append((parse_number(m.group(2)), unit, m.start(2), m.end(3), 1))
     for m in QUANTITY.finditer(card.match):
@@ -115,13 +161,25 @@ def number_candidates(
         if start >= card.seller_start:
             continue
         for name, profile in numeric.items():
-            if profile.unit != unit:
+            converted = quantity_in_unit(Quantity(number, unit), profile.unit)
+            if converted is None:
                 continue
-            canon = format_number(number)
-            fit = ranges[name].fit(number) if name in ranges else 0
-            yield Candidate(name, canon, f"{canon} {unit}", card.span(start, end), start, end,
-                            Source.NUMBER, card.zone(start), nearby_affinity(card, profile, start),
-                            lexicon.prior(category, name, canon), fit, slot)
+            canon = format_number(converted.number)
+            fit = ranges[name].fit(converted.number) if name in ranges else 0
+            yield Candidate(
+                name,
+                canon,
+                f"{canon} {profile.unit}",
+                card.span(start, end),
+                start,
+                end,
+                Source.NUMBER,
+                card.zone(start),
+                nearby_affinity(card, profile, start),
+                lexicon.prior(category, name, canon),
+                fit,
+                slot,
+            )
 
 
 def title_model_candidates(
@@ -131,7 +189,7 @@ def title_model_candidates(
     if not in_title:
         return
     brand = min(in_title, key=lambda b: b.start)
-    raw = card.text[brand.end:card.title_end]
+    raw = card.text[brand.end : card.title_end]
     lead = len(raw) - len(raw.lstrip(" -"))
     value = raw.strip(" -")
     if len(value) < 2:
@@ -139,12 +197,25 @@ def title_model_candidates(
     start = brand.end + lead
     end = start + len(value)
     canon = canonical_text(value)
-    yield Candidate(MODEL, canon, value, card.span(start, end), start, end, Source.TITLE_MODEL,
-                    "title", 1.0, lexicon.prior(category, MODEL, canon), 0)
+    yield Candidate(
+        MODEL,
+        canon,
+        value,
+        card.span(start, end),
+        start,
+        end,
+        Source.TITLE_MODEL,
+        "title",
+        1.0,
+        lexicon.prior(category, MODEL, canon),
+        0,
+    )
 
 
 def extract_candidates(
-    card: CardText, profiles: Mapping[str, AttributeProfile], lexicon: Lexicon,
+    card: CardText,
+    profiles: Mapping[str, AttributeProfile],
+    lexicon: Lexicon,
     category: int | None,
 ) -> list[Candidate]:
     ranges = seller_ranges(card, profiles)

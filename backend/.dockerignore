@@ -1,4 +1,7 @@
 .venv
+.local
+.env
+.env.*
 .mypy_cache
 .pytest_cache
 .ruff_cache
@@ -7,3 +10,4 @@
 tests
 benchmarks
 scripts
+data

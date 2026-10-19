@@ -1,0 +1,29 @@
+.content,
+.rejected {
+  display: grid;
+  gap: var(--space-12);
+  min-inline-size: 0;
+}
+
+.summary {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  margin: 0;
+}
+
+.rejected {
+  justify-items: start;
+}
+
+.list {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  margin: 0;
+  padding-inline-start: var(--space-24);
+  overflow-wrap: anywhere;
+}
+
+.fields {
+  composes: plainList from "../../../shared/styles/compose.module.css";
+  display: grid;
+  gap: var(--space-8);
+  min-inline-size: 0;
+}

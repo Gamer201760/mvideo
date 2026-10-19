@@ -1,0 +1,131 @@
+{
+  "version": "acceptance-study-v1",
+  "date": "2026-10-19",
+  "scope": "Current hybrid orchestration + offline LocalRulesModel; imported1107-category catalog, category_id=None, no feedback. Fixed heuristic gate compared with two independent agent reviews; not human calibration or external gateway quality.",
+  "reference": "Two independently spawned blinded full-input agent reviews; not human gold",
+  "human_verified": false,
+  "product_external_model_calls": 0,
+  "sample": {
+    "input_cards": 130,
+    "tune": 30,
+    "confirm": 100,
+    "reviewed_answers": 284,
+    "all_supported_answers": 1354,
+    "selection": "Fixed hash-ranked val sample absent from315 inventoried historical source files and old120-card benchmark; no gold/outcome filtering",
+    "duplicates": "Normalized word-trigram Jaccard>=0.8; exact prefix-filter search against train/historical cards and mutual selected cards; not semantic deduplication",
+    "inventory": {
+      "historical_ids": 13384,
+      "pool_requested": 1000,
+      "pool_loaded": 431,
+      "reference_cards": 434092,
+      "excluded_near_reference": 258,
+      "retained": 173
+    },
+    "near_duplicate_scope": "Lexical, not semantic; source identity checked against processed train and declared historical SKU IDs"
+  },
+  "review": {
+    "reviewers": 2,
+    "all_accepted_answers_reviewed": true,
+    "nonaccepted_controls": "One SHA256-ranked answer per card when available",
+    "blinding": [
+      "score",
+      "acceptance status",
+      "partition",
+      "catalog gold",
+      "other review"
+    ],
+    "full_input_required": true,
+    "unknown_and_disagreement": "Kept unconfirmed in complete accepted denominators"
+  },
+  "partitions": {
+    "tune": {
+      "threshold": 0.95,
+      "input_cards": 30,
+      "nonempty_accepted_cards": 19,
+      "confirmed_cards": 12,
+      "unconfirmed_cards": 7,
+      "card_confirmation_rate": 0.631578947368421,
+      "one_sided_exact95_card_lower": 0.41806447481419173,
+      "accepted_fields": 40,
+      "confirmed_fields": 30,
+      "field_confirmation_rate": 0.75,
+      "field_acceptance_coverage": 0.12345679012345678,
+      "card_acceptance_coverage": 0.6333333333333333,
+      "answer_disagreements": 1,
+      "answer_unknowns": 0,
+      "accepted_card_category_disagreements": 0,
+      "accepted_card_category_unknowns": 0,
+      "gate": "failed_agent_reference",
+      "human_verified": false
+    },
+    "confirm": {
+      "threshold": 0.95,
+      "input_cards": 100,
+      "nonempty_accepted_cards": 55,
+      "confirmed_cards": 38,
+      "unconfirmed_cards": 17,
+      "card_confirmation_rate": 0.6909090909090909,
+      "one_sided_exact95_card_lower": 0.573172556124786,
+      "accepted_fields": 120,
+      "confirmed_fields": 91,
+      "field_confirmation_rate": 0.7583333333333333,
+      "field_acceptance_coverage": 0.11650485436893204,
+      "card_acceptance_coverage": 0.55,
+      "answer_disagreements": 3,
+      "answer_unknowns": 0,
+      "accepted_card_category_disagreements": 1,
+      "accepted_card_category_unknowns": 0,
+      "gate": "failed_agent_reference",
+      "human_verified": false
+    }
+  },
+  "admissible_scores": [
+    1.0
+  ],
+  "confirmation_failure_breakdown": {
+    "cards_category_unconfirmed": 5,
+    "fields_category_unconfirmed": 14,
+    "cards_values_unconfirmed": 12,
+    "fields_values_unconfirmed": 15,
+    "overlap_cards": 0,
+    "overlap_fields": 0
+  },
+  "decision": {
+    "target": 0.95,
+    "threshold": 0.95,
+    "gate": "failed_agent_reference",
+    "runtime_changed": false,
+    "threshold_selected": false,
+    "reason": "All admissible heuristic scores equal1; raising the threshold up to1 retains the same errors. Fixed confirm results do not support target95% even against the agent reference. No sample expansion after results."
+  },
+  "validation": {
+    "backend_tests": 528,
+    "ruff": "passed",
+    "format": "passed",
+    "mypy": "passed",
+    "review_packet_reproduction": "Exact byte-identical subset from tracked packet builder",
+    "runtime_source_unchanged_since_inference": true
+  },
+  "sha256": {
+    "protocol": "9659506a8d82f613826fc187b1b5793ec89c7dab9253e5c66ee27a205cd1ba02",
+    "sample": "8fae75aa2a509719cb86561d5166bab1ecd993ecc109fd110f56731cd0304c35",
+    "predictions": "b397823854775a5f5c4a044e2af15ac5826b0426f39a1142bbf4203a2300adf4",
+    "review_protocol": "c502980be6a71095f4077dac64070a73796939bcf6352c76378b668c33ddf86d",
+    "review_packet": "a63a19b01fdbeba94b0c7ebfc02cd7e478bc0cde2dca1c096e9bbe31a68a8bf0",
+    "review_a": "9081670dc91721588fcab176c92f5b2a8374174a5e31256ebe5d36f80fad0a25",
+    "review_b": "6b03314a314badd7620357f64dd670a2d634def5c9b6bf7e4e4340b428280d99",
+    "raw_score": "8fc0c56681f869828b1a32617dca00baaac505577865a5734bf1de3ac18d1447",
+    "backend_tests": "70f3717982f2ccb9c4f2dd2062fd75896f7b60c4040f44a5f9702861ba0f15bb",
+    "inference_implementation_manifest": "08bec7c3b002cd52e8d2d186f7ea6ab96dced6b116603ade6a7d187b65734c10",
+    "scoring_implementation_manifest": "dec577515fe75458ebc9c91561fc0ac827cae1addb924875cd57a46df4a037ff"
+  },
+  "limitations": [
+    "Agent consensus is not human gold",
+    "Historical inventory is bounded to declared artifacts; unknown external usage cannot be excluded",
+    "Exact binomial interval assumes independent card outcomes and does not account for annotation errors or lexical cluster dependence",
+    "LocalRulesModel validation does not measure external gateway inference",
+    "The fixed sample had only55 nonempty confirm cards; even55/55 confirmations would yield at most94.70% one-sided exact95 lower bound. Actual lower bound57.32%.",
+    "No accuracy guarantee for the shipped8-category demo configuration or real gateway provider",
+    "This confirm sample becomes development if used to change runtime rules; new confirmation required afterward"
+  ]
+}

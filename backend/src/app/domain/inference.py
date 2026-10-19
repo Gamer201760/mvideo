@@ -34,7 +34,6 @@ class Usage:
     input_tokens: int | None = None
     output_tokens: int | None = None
     cost_usd: float | None = None
-    cost_rub: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

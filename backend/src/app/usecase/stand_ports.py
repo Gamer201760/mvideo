@@ -6,9 +6,10 @@ from typing import Protocol
 from app.domain.card_text import SellerParam
 from app.domain.lexicon import LexiconEntry
 from app.domain.profile import AttributeProfile
-from app.domain.review import Alias, ReviewItem, ReviewStatus
+from app.domain.review import Alias, ReviewItem
 from app.usecase.baseline_ports import RequiredRecord
 from app.usecase.extraction import CardExtraction
+from app.usecase.review_query import ReviewPage, ReviewQuery
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -66,8 +67,13 @@ class StandPackSink(Protocol):
 
 
 class CandidateChooser(Protocol):
-    async def choose(self, extraction: CardExtraction, threshold: float, category_id: int | None,
-                     known: frozenset[str]) -> CardExtraction: ...
+    async def choose(
+        self,
+        extraction: CardExtraction,
+        threshold: float,
+        category_id: int | None,
+        known: frozenset[str],
+    ) -> CardExtraction: ...
 
 
 class ReviewRepository(Protocol):
@@ -77,7 +83,7 @@ class ReviewRepository(Protocol):
 
     async def save(self, item: ReviewItem) -> None: ...
 
-    async def list(self, status: ReviewStatus | None) -> list[ReviewItem]: ...
+    async def page(self, query: ReviewQuery) -> ReviewPage: ...
 
 
 class AliasRepository(Protocol):

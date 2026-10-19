@@ -1,0 +1,76 @@
+.panel {
+  composes: raisedSurface from "../../../styles/compose.module.css";
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-dialog);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  inline-size: 100%;
+  block-size: 100dvh;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: var(--space-20);
+  color: var(--text-primary);
+  overscroll-behavior: contain;
+  animation: var(--motion-drawer-in);
+  view-transition-name: evidence-source;
+}
+
+.panel:not([open]) {
+  display: none;
+}
+
+.panel[open] {
+  border-radius: 0;
+}
+
+.panel[data-state="closed"] {
+  animation: var(--motion-drawer-out);
+}
+
+.panel[data-instant="true"] {
+  animation: none;
+}
+
+.panel::backdrop {
+  background-color: var(--surface-base);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.title {
+  composes: subheadingText from "../../../styles/compose.module.css";
+  margin: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+@media (min-width: 64rem) {
+  .panel {
+    position: sticky;
+    inset: auto;
+    inset-block-start: calc(var(--header-height) + var(--space-24));
+    z-index: var(--layer-sticky);
+    block-size: calc(100svh - var(--header-height) - var(--space-48));
+    min-inline-size: 0;
+  }
+
+  .panel[open] {
+    border-radius: var(--radius-lg);
+  }
+}

@@ -14,9 +14,23 @@ interface Span {
   readonly value: ExtractedValue
 }
 
-function spansOf(values: readonly ExtractedValue[], length: number): Span[] {
+function spansOf(values: readonly ExtractedValue[], length: number, active: string | null): Span[] {
+  const selected = values.find(
+    (value) =>
+      value.attribute === active &&
+      value.start >= 0 &&
+      value.end > value.start &&
+      value.end <= length,
+  )
   const sorted = values
     .filter((v) => v.end > v.start && v.start >= 0 && v.end <= length)
+    .filter(
+      (value) =>
+        selected === undefined ||
+        value === selected ||
+        value.end <= selected.start ||
+        value.start >= selected.end,
+    )
     .map((value) => ({ start: value.start, end: value.end, value }))
     .sort((a, b) => a.start - b.start || b.end - a.end)
   const kept: Span[] = []
@@ -30,7 +44,7 @@ function spansOf(values: readonly ExtractedValue[], length: number): Span[] {
 export function CardText({ text, values, activeAttribute }: CardTextProps) {
   const parts: ReactNode[] = []
   let cursor = 0
-  for (const span of spansOf(values, text.length)) {
+  for (const span of spansOf(values, text.length, activeAttribute)) {
     if (span.start > cursor) parts.push(text.slice(cursor, span.start))
     parts.push(
       <mark
@@ -38,6 +52,7 @@ export function CardText({ text, values, activeAttribute }: CardTextProps) {
         className={styles.mark}
         data-status={span.value.status}
         data-active={span.value.attribute === activeAttribute}
+        data-thread-target={span.value.attribute}
         title={span.value.attribute}
       >
         {text.slice(span.start, span.end)}

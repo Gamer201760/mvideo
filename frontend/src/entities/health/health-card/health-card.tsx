@@ -1,4 +1,4 @@
-import { useErrorText, useFormatters, useTranslation } from "@/shared/i18n"
+import { useErrorCopy, useFormatters, useTranslation } from "@/shared/i18n"
 import { Swap, useLoadingIndicator } from "@/shared/motion"
 import { Button, Card, ErrorState, Icon, Skeleton, Spinner } from "@/shared/ui"
 import { HEALTH_PATH, useHealth } from "../health.queries"
@@ -11,7 +11,7 @@ export interface HealthCardProps {
 
 export function HealthCard({ motionIndex }: HealthCardProps) {
   const { t } = useTranslation()
-  const errorText = useErrorText()
+  const errorCopy = useErrorCopy()
   const { time } = useFormatters()
   const query = useHealth()
   const hasData = query.data !== undefined
@@ -52,7 +52,7 @@ export function HealthCard({ motionIndex }: HealthCardProps) {
         ) : null}
         {view === "error" ? (
           <ErrorState
-            title={errorText(query.error)}
+            {...errorCopy(query.error)}
             onRetry={refetch}
             retryPending={query.isFetching}
           />

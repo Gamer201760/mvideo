@@ -37,20 +37,46 @@ export function rasterHtml(mark: string, asset: RasterAsset, colors: ThemePalett
   )
 }
 
+export interface CardArt {
+  readonly mark: string
+  readonly partner: string
+  readonly prefix: string
+  readonly value: string
+  readonly quote: string
+}
+
+function wordmark(name: string, accent: string): string {
+  const lower = escapeHtml(name.toLowerCase())
+  const at = lower.lastIndexOf("i")
+  if (at < 0) return lower
+  return `${lower.slice(0, at)}<span style="position:relative;display:inline-block">ı<span style="position:absolute;left:50%;top:-0.02em;width:0.19em;height:0.19em;border-radius:50%;background:${accent};transform:translateX(-50%)"></span></span>${lower.slice(at + 1)}`
+}
+
 export function cardHtml(
-  mark: string,
+  art: CardArt,
   text: CardText,
-  colors: ThemePalette,
+  light: ThemePalette,
+  dark: ThemePalette,
   fonts: string,
   family: string,
 ): string {
-  const body = `<div id="asset" style="width:1200px;height:630px;display:grid;grid-template-rows:auto 1fr auto;padding:72px 88px;background:${colors.surface};color:${colors.base};-webkit-font-smoothing:antialiased">
-  <div style="display:flex;align-items:center;gap:22px"><div style="width:72px;height:72px">${mark}</div><span style="font-size:44px;font-weight:650;letter-spacing:-0.02em">${escapeHtml(text.name)}</span></div>
-  <div style="display:grid;align-content:center;gap:28px">
-    <p style="font-size:68px;font-weight:700;line-height:1.05;letter-spacing:-0.035em;text-wrap:balance;max-width:1000px">${escapeHtml(text.tagline)}</p>
-    <p style="font-size:30px;line-height:1.35;color:${colors.muted};max-width:960px;text-wrap:pretty">${escapeHtml(text.description)}</p>
+  const body = `<div id="asset" style="position:relative;width:1200px;height:630px;display:grid;grid-template-rows:auto 1fr auto;padding:64px 80px;background:${light.shell};color:${dark.base};-webkit-font-smoothing:antialiased;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:18px">
+    <div style="width:64px;height:59px">${art.mark}</div>
+    <span style="font-size:52px;font-weight:800;letter-spacing:-0.045em;line-height:1">${wordmark(text.name, dark.accent)}</span>
+    <span style="font-size:24px;font-weight:650;color:${dark.muted};margin-left:12px">${escapeHtml(art.prefix)}</span>
+    <div style="height:26px;display:flex">${art.partner}</div>
   </div>
-  <div style="display:flex;align-items:center;gap:20px;padding-top:28px;border-top:2px solid ${colors.line};font-size:26px;color:${colors.muted}"><span style="width:14px;height:14px;border-radius:50%;background:${colors.accent}"></span>${escapeHtml(text.site)}</div>
+  <div style="display:grid;align-content:center;gap:24px;max-width:760px">
+    <p style="font-size:64px;font-weight:800;line-height:1.02;letter-spacing:-0.04em;text-wrap:balance">${escapeHtml(text.tagline)}</p>
+    <p style="font-size:26px;line-height:1.4;color:${dark.muted};text-wrap:pretty">${escapeHtml(text.description)}</p>
+  </div>
+  <div style="font-size:22px;font-weight:650;color:${dark.muted}">${text.site === "" ? "" : escapeHtml(text.site)}</div>
+  <div style="position:absolute;right:88px;top:250px;display:grid;gap:120px;justify-items:end">
+    <span style="font-family:ui-monospace,Consolas,monospace;font-size:24px;padding:8px 14px;border-radius:10px;background:${dark.raised};color:${dark.base}">${escapeHtml(art.quote)}</span>
+    <span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;padding:6px 18px;border-radius:14px;background:${dark.raised}">${escapeHtml(art.value)}</span>
+  </div>
+  <svg style="position:absolute;right:0;top:0" width="1200" height="630" viewBox="0 0 1200 630"><path d="M1134 272 C1172 272 1172 447 1134 447" fill="none" stroke="${dark.accent}" stroke-width="3" stroke-linecap="round"/><circle cx="1134" cy="272" r="6" fill="${dark.accent}"/><circle cx="1134" cy="447" r="6" fill="${dark.accent}"/></svg>
 </div>`
   return page(body, `${fonts}#asset{font-family:${family}}`)
 }

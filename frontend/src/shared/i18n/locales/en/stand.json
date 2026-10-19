@@ -1,12 +1,10 @@
 {
   "title": "Attributes from a product card",
-  "description": "Paste a seller card or pick a sample. Every value comes with a quote from the card, a confidence score and the step that found it. Values below the threshold wait for a person in the review queue.",
   "form": {
     "title": "Product card",
-    "example": "Sample from the test set",
-    "examplePlaceholder": "Pick a sample card",
+    "example": "Or try an example",
     "category": "Category",
-    "categoryPlaceholder": "Pick a category",
+    "categoryPlaceholder": "Detect from card",
     "categoryHint_one": "{{count, number}} required attribute",
     "categoryHint_other": "{{count, number}} required attributes",
     "titleField": "Title",
@@ -16,11 +14,28 @@
     "seller": "Seller attributes",
     "sellerHint": "One per line, as name: value",
     "sellerPlaceholder": "Color: black",
-    "submit": "Extract attributes"
+    "submit": "Extract attributes",
+    "engine": "Extraction method",
+    "hybrid": "Automatic",
+    "rules": "Rules",
+    "categoryAuto": "Detect from card",
+    "details": "Category and seller attributes",
+    "detailsHint": "Optional",
+    "submitHint": "Ctrl+Enter",
+    "back": "Back",
+    "useExample": "Use example: {{title}}",
+    "sellerErrors": {
+      "summary": "Fix these seller attribute lines before submitting the card.",
+      "line": "Line {{line, number}}: {{reason}}",
+      "missingSeparator": "Add a colon between the name and value.",
+      "missingName": "Enter an attribute name before the colon.",
+      "missingValue": "Enter a value after the colon."
+    }
   },
   "result": {
     "title": "Extracted attributes",
-    "threshold": "Threshold {{value}}",
+    "threshold": "Acceptance threshold {{value}}",
+    "manualMode": "Review-only mode",
     "empty": {
       "title": "No card yet",
       "description": "Pick a sample or paste a card on the left, then run the extraction."
@@ -30,16 +45,22 @@
     "columns": {
       "attribute": "Attribute",
       "value": "Value",
-      "confidence": "Confidence",
-      "source": "Source",
-      "quote": "Quote"
+      "quote": "Quote",
+      "confidence": "Confidence"
     },
     "status": {
-      "accepted": "In the catalog",
+      "automatic": "Accepted by threshold",
+      "accepted": "Confirmed",
       "review": "Needs review"
     },
-    "missingTitle": "Not found in the text",
-    "missingNone": "Every required attribute has a value"
+    "missingTitle": "Unfilled attributes",
+    "missingNone": "Every required attribute has a value",
+    "missingUnconfirmed": "Some extracted attributes have no confirmed value",
+    "requiredUnknown": "Required attributes have not been defined",
+    "uncalibrated": "Not rated",
+    "extraTitle": "Additional attributes",
+    "categoryUnknown": "Category not detected. Select it manually and retry.",
+    "category": "Category"
   },
   "source": {
     "key_value": "Key and value line",
@@ -50,50 +71,122 @@
     "review": "Confirmed by a person",
     "catalog_twin": "Catalog twin",
     "other": "Other rule",
-    "neighbor": "Catalog neighbour hint"
+    "hybrid": "Card text"
   },
   "review": {
-    "title": "Review queue",
-    "description": "Low confidence values. A decision here becomes a dictionary alias and the card is extracted again.",
-    "count_one": "{{count, number}} waiting",
-    "count_other": "{{count, number}} waiting",
-    "empty": {
-      "title": "Queue is empty",
-      "description": "Values below the threshold appear here after an extraction."
-    },
-    "loading": "Loading the queue",
-    "confidence": "Confidence {{value}}",
+    "title": "Current card corrections",
+    "description": "Confirm or edit a value in the table. The decision is saved for this card without extracting it again.",
+    "confidence": "Support score {{value}}",
     "accept": "Accept",
     "correct": "Correct",
     "save": "Save",
     "cancel": "Cancel",
-    "valueLabel": "Correct value for {{attribute}}"
+    "valueLabel": "Correct value for {{attribute}}",
+    "currentCount": "Awaiting review in this card: {{count, number}}",
+    "savedWithoutCard": "Decision saved. To rerun this older entry, enter its original card again.",
+    "previous": "Previous",
+    "next": "Next",
+    "editInline": "Edit manually: {{attribute}}",
+    "acceptInline": "Confirm value: {{attribute}}",
+    "confirm": "Confirm",
+    "addInline": "Add value: {{attribute}}",
+    "rejectedTitle": "Rejected by you",
+    "quoteLabel": "Exact quote from the card",
+    "quoteHint": "Copy the supporting text from the card. This value will be saved as a manual decision.",
+    "quoteInvalid": "The quote must match a non-empty passage in the card exactly.",
+    "restoreInline": "Restore: {{attribute}}"
   },
-  "mode": {
-    "label": "Input",
-    "card": "Card by fields",
-    "text": "Plain text"
+  "progress": {
+    "candidates": "Product category",
+    "searching": "Finding similar categories",
+    "extracting": "Selecting a category and filling attributes",
+    "done": "Category selected",
+    "selected": "Selected",
+    "empty": "No matching categories found"
   },
-  "text": {
-    "title": "Plain text",
-    "field": "Text or page HTML",
-    "placeholder": "Paste a product description or a whole copied shop page",
-    "hint": "Menus, scripts, the footer and the “similar products” block are dropped; quotes point into this text",
-    "submit": "Find category and attributes",
-    "category": "Category",
-    "categoryUnknown": "Category unknown: confidence is below the threshold",
-    "categoryConfidence": "confidence {{value}}",
-    "candidates": "Candidates",
-    "productTitle": "Title",
-    "titleNone": "No title found in the text",
-    "titleSource": {
-      "llm": "found by the LLM",
-      "rule": "found by a rule"
+  "risk": {
+    "title": "Support score",
+    "score": "{{value, number}} / {{max, number}}",
+    "low": "Low risk",
+    "medium": "Medium risk",
+    "high": "High risk",
+    "reasons": {
+      "field_unconfirmed": "The link between the value and the field needs review",
+      "number_unconfirmed": "Check the number or unit",
+      "negation": "Context contains a negation",
+      "object_context": "May refer to another object",
+      "range_lost": "Quote contains a range or limit",
+      "conflicting_values": "Card contains conflicting values",
+      "model_scope": "Property scope is ambiguous",
+      "model_conflict": "Possible contradiction",
+      "model_inference": "Check the link to the quote",
+      "indirect_value": "Value does not directly match the quote",
+      "category_ambiguity": "Category selection is ambiguous",
+      "invalid_evidence": "Quote is not supported",
+      "other": "Needs review",
+      "exact_quote": "Exact quote",
+      "value_supported": "Value supported",
+      "number_supported": "Number and unit match",
+      "category_field": "Field matches category"
     },
-    "search": {
-      "embeddings": "embedding search",
-      "tfidf": "TF-IDF search"
-    },
-    "cleanTitle": "Cleaned text with quotes"
+    "meter": "{{level}}, score {{value, number}} of {{max, number}}",
+    "explain": "Why this score: {{attribute}}"
+  },
+  "rejections": {
+    "title": "Omitted after checking the quote",
+    "invalidEvidence": "The quote was not found in the card.",
+    "conflictingValues": "The card contains conflicting values.",
+    "otherProduct": "The property refers to packaging or another product.",
+    "otherField": "The quote describes a different attribute.",
+    "fieldUnconfirmed": "The quote does not establish this attribute.",
+    "negation": "The value does not match the negation in the text.",
+    "unitMismatch": "The units do not match the attribute.",
+    "numberUnconfirmed": "The number, sign or unit does not match the text.",
+    "rangeMismatch": "The bounds or type of range do not match.",
+    "rangeLost": "The text gives a range or limit, rather than an exact number.",
+    "valueUnconfirmed": "The quote does not support the value.",
+    "fieldTypeMismatch": "The value does not match the attribute type.",
+    "conditionalSupport": "Support depends on a condition. An unconditional value was omitted."
+  },
+  "evidence": {
+    "openAttribute": "Show source quote for {{attribute}}",
+    "close": "Hide text",
+    "source": "Source text",
+    "open": "Show source text"
+  },
+  "workspace": {
+    "interrupted": "Extraction was interrupted",
+    "interruptedDescription": "The request is saved. Retry it explicitly or return to the previous result.",
+    "resume": "Retry extraction",
+    "previous": "Back to previous result",
+    "checking": "Saved result. Checking decisions with the server.",
+    "unchecked": "Saved result. Decisions could not be checked with the server."
+  },
+  "history": {
+    "title": "Extraction history",
+    "description": "Saved cards and requests in progress.",
+    "empty": "No extractions yet",
+    "emptyDescription": "Processed cards will appear here.",
+    "open": "Open",
+    "refresh": "Refresh",
+    "status": {
+      "running": "In progress",
+      "completed": "Completed",
+      "failed": "Failed",
+      "interrupted": "Interrupted"
+    }
+  },
+  "landing": {
+    "title": "Turn descriptions into product cards",
+    "description": "Paste the seller’s text. Admit finds attributes and links each value to its source, ready for your review.",
+    "sourceTitle": "Product description",
+    "resultTitle": "Attributes",
+    "caption": "From a phrase in the text to a filled field",
+    "pause": "Pause",
+    "resume": "Resume"
+  },
+  "export": {
+    "download": "Download JSON",
+    "failed": "Could not export the card"
   }
 }

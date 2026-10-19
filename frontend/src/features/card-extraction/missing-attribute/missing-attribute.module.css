@@ -1,0 +1,21 @@
+.root {
+  min-inline-size: 0;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-16);
+  padding-block: var(--space-12);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.error {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  color: var(--text-danger);
+  margin: 0;
+}

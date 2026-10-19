@@ -32,7 +32,7 @@ def test_candidates_carry_quotes_and_pick_expected_values() -> None:
     profiles = dict(lexicon.profiles)
     candidates = extract_candidates(card, profiles, lexicon, PHONE)
     for c in candidates:
-        assert card.text[c.start:c.end] == c.evidence
+        assert card.text[c.start : c.end] == c.evidence
     picks = pick_values(candidates, profiles)
     assert picks["Бренд"].candidate.value == "Samsung"
     assert picks["Модель"].candidate.value == "Galaxy S26"
@@ -46,7 +46,9 @@ def test_candidates_carry_quotes_and_pick_expected_values() -> None:
 def test_seller_key_value_is_a_candidate_but_ranges_are_not() -> None:
     lexicon = build_lexicon(lexicon_rows())
     card = build_card_text(
-        "Смартфон", "", (SellerParam("Цвет", "фиолетовый"), SellerParam("Диагональ экрана", "6.2 - 6.5\""))
+        "Смартфон",
+        "",
+        (SellerParam("Цвет", "фиолетовый"), SellerParam("Диагональ экрана", '6.2 - 6.5"')),
     )
     candidates = extract_candidates(card, dict(lexicon.profiles), lexicon, PHONE)
     colors = [c for c in candidates if c.attribute == "Цвет"]
@@ -61,10 +63,14 @@ def test_no_text_no_candidates() -> None:
 
 
 def test_seller_name_feeds_only_the_closest_attribute() -> None:
-    rows = lexicon_rows() + [
-        TrainValue(PHONE, "Процессор", "Qualcomm Snapdragon 8 Gen 2", None),
-        TrainValue(PHONE, "Производитель процессора", "Qualcomm", None),
-    ] * 2
+    rows = (
+        lexicon_rows()
+        + [
+            TrainValue(PHONE, "Процессор", "Qualcomm Snapdragon 8 Gen 2", None),
+            TrainValue(PHONE, "Производитель процессора", "Qualcomm", None),
+        ]
+        * 2
+    )
     lexicon = build_lexicon(rows)
     card = build_card_text("Смартфон", "", (SellerParam("Производитель процессора", "Qualcomm"),))
     candidates = extract_candidates(card, dict(lexicon.profiles), lexicon, PHONE)

@@ -41,6 +41,7 @@ export interface ButtonProps
   readonly size?: ButtonSize
   readonly icon?: IconName | undefined
   readonly pending?: boolean
+  readonly iconOnly?: boolean
   readonly type?: "button" | "submit"
   readonly ref?: Ref<HTMLButtonElement> | undefined
   readonly children: ReactNode
@@ -51,6 +52,7 @@ export function Button({
   size = "regular",
   icon,
   pending = false,
+  iconOnly = false,
   type = "button",
   className,
   onClick,
@@ -68,7 +70,13 @@ export function Button({
     <button
       {...rest}
       type={type}
-      className={clsx(styles.button, VARIANT_CLASS[variant], SIZE_CLASS[size], className)}
+      className={clsx(
+        styles.button,
+        VARIANT_CLASS[variant],
+        SIZE_CLASS[size],
+        iconOnly && styles.iconOnly,
+        className,
+      )}
       aria-busy={pending || undefined}
       aria-disabled={pending || undefined}
       onClick={handleClick}

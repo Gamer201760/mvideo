@@ -1,0 +1,25 @@
+.meter {
+  display: inline-block;
+  flex: none;
+  inline-size: var(--meter-width);
+  block-size: var(--meter-height);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-sunken);
+}
+
+.fill {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  transform: scaleX(var(--share));
+  transform-origin: left center;
+}
+
+.settled .fill {
+  background-color: var(--status-settled);
+}
+
+.attention .fill {
+  background-color: var(--status-attention);
+}

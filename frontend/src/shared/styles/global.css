@@ -86,6 +86,26 @@ samp {
   animation-timing-function: var(--ease-out);
 }
 
+:root[data-view-transition="stage"]::view-transition-group(extraction-stage) {
+  animation-duration: var(--dur-panel);
+  animation-timing-function: var(--ease-in-out);
+}
+
+:root[data-view-transition="stage"]::view-transition-old(extraction-stage),
+:root[data-view-transition="stage"]::view-transition-new(extraction-stage) {
+  block-size: 100%;
+  object-fit: none;
+  object-position: top;
+}
+
+:root[data-view-transition="stage"]::view-transition-old(extraction-stage) {
+  animation: var(--motion-stage-out);
+}
+
+:root[data-view-transition="stage"]::view-transition-new(extraction-stage) {
+  animation: var(--motion-stage-in);
+}
+
 :root[data-view-transition="layout"]::view-transition-group(*) {
   animation-duration: var(--dur-panel);
   animation-timing-function: var(--ease-out);
@@ -100,4 +120,43 @@ samp {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+:root[data-view-transition^="evidence-"]::view-transition {
+  pointer-events: none;
+}
+
+:root[data-view-transition^="evidence-"]::view-transition-old(root),
+:root[data-view-transition^="evidence-"]::view-transition-new(root) {
+  animation: none;
+}
+
+:root[data-view-transition^="evidence-"]::view-transition-group(*) {
+  animation-duration: var(--dur-drawer);
+  animation-timing-function: var(--ease-drawer);
+}
+
+:root[data-view-transition="evidence-close"]::view-transition-group(*) {
+  animation-duration: var(--dur-drawer-exit);
+}
+
+:root[data-view-transition^="evidence-"]::view-transition-old(evidence-results),
+:root[data-view-transition^="evidence-"]::view-transition-new(evidence-results) {
+  block-size: 100%;
+  object-fit: none;
+  object-position: top left;
+  animation-duration: var(--dur-drawer);
+}
+
+:root[data-view-transition="evidence-close"]::view-transition-old(evidence-results),
+:root[data-view-transition="evidence-close"]::view-transition-new(evidence-results) {
+  animation-duration: var(--dur-drawer-exit);
+}
+
+:root[data-view-transition="evidence-open"]::view-transition-new(evidence-source) {
+  animation: var(--motion-drawer-in);
+}
+
+:root[data-view-transition="evidence-close"]::view-transition-old(evidence-source) {
+  animation: var(--motion-drawer-out);
 }

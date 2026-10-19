@@ -1,14 +1,24 @@
 export {
+  type AttributeReviewSlots,
   AttributeTable,
   type AttributeTableProps,
   sourceKey,
 } from "./attribute-table/attribute-table"
 export { CardText, type CardTextProps } from "./card-text/card-text"
+export { CategoryPath, type CategoryPathProps } from "./category-path/category-path"
+export { useAddAttribute } from "./completion.queries"
+export { type CardExport, type CardExportSource, useCardExport } from "./export.queries"
+export { latestDecisions, reconcileReviews } from "./review-result"
 export {
-  MissingAttributes,
-  type MissingAttributesProps,
-} from "./missing-attributes/missing-attributes"
+  RUN_PAGE_SIZE,
+  type RunDetail,
+  type RunSummary,
+  runKeys,
+  useOpenRun,
+  useRuns,
+} from "./run.queries"
 export {
+  type CardReviewState,
   type ExtractedValue,
   type ExtractInput,
   type ExtractResult,
@@ -20,13 +30,10 @@ export {
   type StandExample,
   type StandInfo,
   standKeys,
-  type TextInput,
-  type TextResult,
-  type TextValue,
+  useCardReviews,
+  useCategoryPreview,
   useExamples,
   useExtract,
-  useExtractText,
   useResolveReview,
-  useReviewQueue,
   useStandInfo,
 } from "./stand.queries"

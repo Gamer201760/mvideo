@@ -1,23 +1,79 @@
 .error {
-  composes: statePanel from "../../../styles/compose.module.css";
-  gap: var(--space-8);
+  display: grid;
+  gap: var(--space-12) var(--space-16);
+  min-inline-size: 0;
+  animation: var(--motion-fade-in);
 }
 
-.icon {
-  color: var(--status-danger);
+.badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--state-badge);
+  block-size: var(--state-badge);
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-evidence);
+  color: var(--text-attention);
+}
+
+.copy {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
 }
 
 .title {
-  font-weight: var(--weight-semibold);
-  text-wrap: balance;
+  composes: subheadingText from "../../../styles/compose.module.css";
+  margin: 0;
+  color: var(--text-primary);
 }
 
 .description {
   composes: secondaryText from "../../../styles/compose.module.css";
   max-inline-size: var(--prose-measure);
-  overflow-wrap: anywhere;
+  margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
-.retry {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.panel {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  padding-block: var(--space-16);
+}
+
+.panel .actions {
+  grid-column: 2;
+}
+
+.page {
+  align-content: center;
+  justify-items: center;
+  min-block-size: calc(100dvh - var(--header-height) - var(--space-64));
+  padding-block: var(--space-48);
+  text-align: center;
+  animation: var(--motion-rise-in);
+}
+
+.page .copy {
+  justify-items: center;
+  gap: var(--space-8);
+}
+
+.page .title {
+  font-size: var(--font-size-heading);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--tracking-tight);
+}
+
+.page .actions {
+  justify-content: center;
   margin-block-start: var(--space-8);
 }

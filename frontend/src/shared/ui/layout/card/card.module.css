@@ -1,12 +1,10 @@
 .card {
+  composes: raisedSurface from "../../../styles/compose.module.css";
   display: grid;
   align-content: start;
   gap: var(--space-16);
   min-inline-size: 0;
   padding: var(--space-card);
-  border: var(--hairline) solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  background-color: var(--surface-raised);
 }
 
 .entering {

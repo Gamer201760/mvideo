@@ -1,0 +1,161 @@
+{
+  "version": "validator-quality-v1",
+  "measured_on": "2026-10-19",
+  "scope": "Conservative validator changes; exact saved requests and model responses, fixed catalog gold and scorer; no new inference",
+  "new_model_calls": 0,
+  "requests_equal": true,
+  "protocol_sha256": "95e6a1b4fac0c015986ffba670071b93d0bd50c7c70b26719ef5b13eeac3982c",
+  "scorer_unchanged": true,
+  "saved_responses_unchanged": true,
+  "implementation_manifest_sha256": {
+    "before": "ce5e143e8fa3dabd79b5c019c60e410b056aa975b89da381efa65096ca8eda1c",
+    "after": "7fc3a9a35e65cc9e45be7530ebb0d48319dd2cccb365332fcb824325425e1571"
+  },
+  "runtime_changes": [
+    "backend/src/app/domain/evidence_composites.py",
+    "backend/src/app/domain/evidence_constraints.py",
+    "backend/src/app/domain/evidence_context.py",
+    "backend/src/app/domain/evidence_signals.py",
+    "backend/src/app/domain/evidence_validation.py"
+  ],
+  "development_review": {
+    "cards": 30,
+    "slots": 193,
+    "reviewer_kind": "agent_full_card_review",
+    "human_verified_slots": 0,
+    "fixed_false_rejections": 6,
+    "remaining_reviewed_false_rejections": 12,
+    "previously_correct_preserved": 93,
+    "previously_correct_lost": 0,
+    "transitions_from_current_baseline": {
+      "correct -> correct": 93,
+      "rejected -> correct": 6,
+      "missing -> missing": 43,
+      "rejected -> rejected": 29,
+      "gold_disagreement -> gold_disagreement": 22
+    },
+    "fixed_families": {
+      "field_alias_or_word_order": 2,
+      "numeric_identifier": 1,
+      "colon_inside_value": 2,
+      "list_of_flags": 1
+    },
+    "remaining_families": {
+      "field_alias_or_word_order": 3,
+      "colon_inside_value": 2,
+      "paraphrase": 3,
+      "foreign_context": 3,
+      "maximum_endpoint": 1
+    },
+    "reviews_sha256": "d783f1015babc61cb190ca0c8660352604131e5c43456cbb3cc8391400db70b2"
+  },
+  "saved_response_replay": {
+    "cards": 120,
+    "gold_slots": 746,
+    "saved_responses": 360,
+    "modes": {
+      "rules": {
+        "before": {
+          "tp": 239,
+          "fp": 77,
+          "fn": 507,
+          "filled": 316,
+          "slots": 746,
+          "precision": 0.7563291139240507,
+          "recall": 0.3203753351206434,
+          "f1": 0.4500941619585687,
+          "coverage": 0.42359249329758714
+        },
+        "after": {
+          "tp": 251,
+          "fp": 78,
+          "fn": 495,
+          "filled": 329,
+          "slots": 746,
+          "precision": 0.7629179331306991,
+          "recall": 0.33646112600536193,
+          "f1": 0.4669767441860465,
+          "coverage": 0.4410187667560322
+        },
+        "cards_with_invalid_quote_offsets": 0
+      },
+      "model": {
+        "before": {
+          "tp": 319,
+          "fp": 97,
+          "fn": 427,
+          "filled": 416,
+          "slots": 746,
+          "precision": 0.7668269230769231,
+          "recall": 0.42761394101876676,
+          "f1": 0.5490533562822719,
+          "coverage": 0.5576407506702413
+        },
+        "after": {
+          "tp": 332,
+          "fp": 104,
+          "fn": 414,
+          "filled": 436,
+          "slots": 746,
+          "precision": 0.7614678899082569,
+          "recall": 0.4450402144772118,
+          "f1": 0.5617597292724196,
+          "coverage": 0.5844504021447721
+        },
+        "cards_with_invalid_quote_offsets": 0
+      },
+      "hybrid": {
+        "before": {
+          "tp": 314,
+          "fp": 103,
+          "fn": 432,
+          "filled": 417,
+          "slots": 746,
+          "precision": 0.7529976019184652,
+          "recall": 0.42091152815013405,
+          "f1": 0.5399828030954428,
+          "coverage": 0.5589812332439679
+        },
+        "after": {
+          "tp": 327,
+          "fp": 109,
+          "fn": 419,
+          "filled": 436,
+          "slots": 746,
+          "precision": 0.75,
+          "recall": 0.4383378016085791,
+          "f1": 0.5532994923857868,
+          "coverage": 0.5844504021447721
+        },
+        "cards_with_invalid_quote_offsets": 0
+      }
+    }
+  },
+  "validation": {
+    "backend_tests_passed": 511,
+    "ruff": "passed",
+    "format": "passed",
+    "mypy": "passed",
+    "api_sqlite_restart": "positive, negative and unknown flags verified with a synthetic model port; not a real provider check"
+  },
+  "artifacts_sha256": {
+    "plan.json": "0a793448d8ff6dd16eeb88f5ddbd1a26dc7387b5b03a58d9ba339f8c42446c50",
+    "dev-before.json": "c145f38914896b7fe4ceb2d5914379ad6bbaf55245a3543102d50b5655b53be7",
+    "dev-current.json": "5047742eb74324c5db45a03547276ee198650fd0924dc4ba55d472d2dcc089a2",
+    "dev-before/rechecked-slots.jsonl": "645c58352bf81e9631ddf91d6276b298b5845ee4bbe791f21eb7d181f653ca16",
+    "dev-current/rechecked-slots.jsonl": "841129f41b953a56173a658d941a905e89a594690dff0398dce7a59c082f61c3",
+    "replay-before/report.json": "3c4ce647a308aba574688c531484de48da6297e9faadfbd0eb94d1fb62bdce8f",
+    "replay-current/report.json": "761ce6a052627cbb43e114ea21b57da398970d882938d0de1dcbe797ece13271",
+    "replay-before/predictions.jsonl": "13ecdf0292d99a6a615ce3fbc16d98b17c523d32c021c6dca129e361d697f181",
+    "replay-current/predictions.jsonl": "437224573b581126fc254663ced6bba93991749a8375eb608022ae48df08252d",
+    "backend-tests-current.log": "6470d1f7fc25eb2e774b3b4ad926ec6d845d56cbd6676a2fbf747cdecdf4b536"
+  },
+  "limitations": [
+    "Development cases were reused and agent reviewed; no independent human gold or threshold calibration",
+    "The 120-card test/new-category bundle was reused historically; replay is diagnostic, not an untouched holdout",
+    "Hybrid precision against catalog proxy gold decreased from 75.30% to 75.00%, despite F1 increasing from 54.00% to 55.33%; new FP counts are retained",
+    "Twelve reviewed false rejections remain; no broad paraphrase or implicit dimension/endpoint inference was added",
+    "No new provider latency, tokens, cost, calibration, or inference batch quality measured",
+    "Private datasets, baseline runtime and detailed outputs are required to reproduce both runs"
+  ]
+}

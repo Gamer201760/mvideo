@@ -1,28 +1,30 @@
 import { useState } from "react"
 import { type ReviewItem, sourceKey } from "@/entities/stand"
-import { useFormatters, useTranslation } from "@/shared/i18n"
+import { useTranslation } from "@/shared/i18n"
 import { Button, TextField } from "@/shared/ui"
 import styles from "./review-row.module.css"
 
 export interface ReviewRowProps {
   readonly item: ReviewItem
   readonly pending: boolean
+  readonly disabled?: boolean
   readonly onAccept: () => void
   readonly onCorrect: (value: string) => void
 }
 
-export function ReviewRow({ item, pending, onAccept, onCorrect }: ReviewRowProps) {
+export function ReviewRow({ item, pending, disabled, onAccept, onCorrect }: ReviewRowProps) {
   const { t } = useTranslation()
-  const { percent } = useFormatters()
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(item.value)
 
   return (
-    <li className={styles.row}>
+    <li id={`review-${item.id}`} tabIndex={-1} className={styles.row}>
       <div className={styles.head}>
         <span className={styles.attribute}>{item.attribute}</span>
         <span className={styles.meta}>
-          {t("stand:review.confidence", { value: percent(item.confidence) })}
+          {t("stand:review.confidence", {
+            value: t("stand:risk.score", { value: Math.round(item.confidence * 100), max: 100 }),
+          })}
         </span>
         <span className={styles.meta}>{t(sourceKey(item.source))}</span>
       </div>
@@ -40,7 +42,7 @@ export function ReviewRow({ item, pending, onAccept, onCorrect }: ReviewRowProps
           className={styles.edit}
           onSubmit={(event) => {
             event.preventDefault()
-            onCorrect(value)
+            if (!disabled) onCorrect(value)
           }}
         >
           <TextField
@@ -50,23 +52,35 @@ export function ReviewRow({ item, pending, onAccept, onCorrect }: ReviewRowProps
             required
           />
           <div className={styles.actions}>
-            <Button type="submit" icon="check" pending={pending} disabled={value.trim() === ""}>
+            <Button
+              type="submit"
+              icon="check"
+              pending={pending}
+              disabled={disabled || value.trim() === ""}
+            >
               {t("stand:review.save")}
             </Button>
-            <Button variant="ghost" onClick={() => setEditing(false)}>
+            <Button variant="ghost" disabled={disabled} onClick={() => setEditing(false)}>
               {t("stand:review.cancel")}
             </Button>
           </div>
         </form>
       ) : (
         <div className={styles.actions}>
-          <Button size="compact" icon="check" pending={pending} onClick={onAccept}>
+          <Button
+            size="compact"
+            icon="check"
+            pending={pending}
+            disabled={disabled}
+            onClick={onAccept}
+          >
             {t("stand:review.accept")}
           </Button>
           <Button
             size="compact"
             variant="secondary"
             icon="correct"
+            disabled={disabled}
             onClick={() => setEditing(true)}
           >
             {t("stand:review.correct")}

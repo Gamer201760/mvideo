@@ -76,8 +76,10 @@ def pick_values(
         sources = tuple(sorted({c.source for _, c in scored}))
         score = top_score + AGREEMENT_BONUS * (len(sources) - 1)
         current = best.get(attribute)
-        if current is None or score > current[0] or (
-            score == current[0] and top.start < current[1].candidate.start
+        if (
+            current is None
+            or score > current[0]
+            or (score == current[0] and top.start < current[1].candidate.start)
         ):
             confidence = round(max(0.01, min(MAX_CONFIDENCE, score)), 4)
             best[attribute] = (score, Pick(top, confidence, sources))

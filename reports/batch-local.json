@@ -1,0 +1,27 @@
+{
+  "created_at": "2026-10-19T10:34:09.352749+00:00",
+  "scope": "synthetic local_rules; no external model calls; no token or production throughput measurement",
+  "cards": 100,
+  "concurrency_limit": 2,
+  "rules_first": false,
+  "single": {
+    "batch_size": 1,
+    "requests": 100,
+    "request_characters": 275090,
+    "request_bytes": 425090,
+    "local_wall_ms": 15.321
+  },
+  "batch": {
+    "batch_size": 4,
+    "requests": 25,
+    "request_characters": 80540,
+    "request_bytes": 120965,
+    "local_wall_ms": 13.136
+  },
+  "requests_reduction_percent": 75.0,
+  "request_characters_reduction_percent": 70.72,
+  "outputs_equal": true,
+  "evidence_spans_valid": true,
+  "implementation_sha256": "0f8a16d6fee524f01acf12093d103c4d1aefc1e7185a94ad3b742f60ec5f75c0",
+  "profiler_sha256": "44a794ee63bba07f2bf7d96ce0d47a371e0b4eda5986c6da2448b2748e9382be"
+}

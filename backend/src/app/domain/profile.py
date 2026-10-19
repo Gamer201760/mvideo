@@ -4,7 +4,14 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from app.domain.card_text import match_form
-from app.domain.values import canonical_unit, leading_quantity
+from app.domain.values import (
+    canonical_key,
+    canonical_unit,
+    display_value,
+    format_number,
+    leading_quantity,
+    quantity_in_unit,
+)
 
 STEM = 5
 STOP_WORDS = frozenset({"для", "или", "при", "без", "под", "над", "тип", "вид", "and", "the"})
@@ -55,6 +62,16 @@ class AttributeProfile:
     @property
     def numeric(self) -> bool:
         return self.kind is Kind.NUMERIC
+
+    def value_key(self, value: str, unit: str | None = None) -> str:
+        return canonical_key(value, unit, self.numeric, target_unit=self.unit)
+
+    def value_display(self, value: str, unit: str | None = None) -> str:
+        quantity = leading_quantity(value, unit or self.unit) if self.numeric else None
+        converted = quantity_in_unit(quantity, self.unit) if quantity is not None else None
+        if converted is not None:
+            return f"{format_number(converted.number)} {self.unit}".strip()
+        return display_value(value, unit)
 
 
 def name_keywords(name: str) -> tuple[str, ...]:

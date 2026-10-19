@@ -19,7 +19,7 @@ function value(attribute: string, start: number, end: number, status: "accepted"
 }
 
 describe("CardText", () => {
-  it("marks quote spans and skips overlapping or out of range spans", () => {
+  it("prioritizes the selected quote and skips overlaps and invalid spans", () => {
     const text = "Phone Samsung black 128 GB"
     const { container } = render(
       <CardText
@@ -34,7 +34,8 @@ describe("CardText", () => {
       />,
     )
     const marks = [...container.querySelectorAll("mark")]
-    expect(marks.map((m) => m.textContent)).toEqual(["Samsung black"])
+    expect(marks.map((m) => m.textContent)).toEqual(["Samsung", "black"])
+    expect(container.querySelector('[data-active="true"]')?.textContent).toBe("Samsung")
     expect(container.textContent).toBe(text)
   })
 

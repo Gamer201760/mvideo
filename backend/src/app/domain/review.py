@@ -13,13 +13,16 @@ REVIEW_SOURCE = "review"
 
 class ReviewStatus(StrEnum):
     PENDING = "pending"
+    AUTO_ACCEPTED = "auto_accepted"
     ACCEPTED = "accepted"
     CORRECTED = "corrected"
+    REJECTED = "rejected"
 
 
 class ReviewAction(StrEnum):
     ACCEPT = "accept"
     CORRECT = "correct"
+    REJECT = "reject"
 
 
 class ReviewItemNotFound(DomainError):
@@ -35,6 +38,16 @@ class ReviewAlreadyResolved(DomainError):
 class InvalidCorrection(DomainError):
     code = "invalid_correction"
     message = "A correction needs a non-empty value"
+
+
+class InvalidReviewEvidence(DomainError):
+    code = "invalid_review_evidence"
+    message = "A manual addition needs an exact non-empty quote from the card"
+
+
+class InvalidReviewAttribute(DomainError):
+    code = "invalid_review_attribute"
+    message = "A manual addition needs a field from the selected category"
 
 
 class StandUnavailable(DomainError):
@@ -70,38 +83,74 @@ class Alias:
     evidence: str
     value: str
     created_at: datetime
+    category_id: int | None = None
+    card_key: str = ""
 
 
 def evidence_form(text: str) -> str:
     return " ".join(match_form(text).split())
 
 
-def alias_entry(alias: Alias, numeric: bool) -> LexiconEntry:
+def alias_entry(alias: Alias, numeric: bool, unit: str | None = None) -> LexiconEntry:
     return LexiconEntry(
         attribute=alias.attribute,
         tokens=value_tokens(alias.evidence),
-        key=canonical_key(alias.value, None, numeric),
+        key=canonical_key(alias.value, None, numeric, target_unit=unit),
         display=alias.value,
     )
 
 
-def resolve(item: ReviewItem, action: ReviewAction, value: str | None,
-            now: datetime) -> tuple[ReviewItem, Alias]:
-    if item.status is not ReviewStatus.PENDING:
+def resolve(
+    item: ReviewItem,
+    action: ReviewAction,
+    value: str | None,
+    now: datetime,
+    *,
+    override: bool = False,
+    expected_value: str | None = None,
+) -> tuple[ReviewItem, Alias | None]:
+    if item.status not in {ReviewStatus.PENDING, ReviewStatus.AUTO_ACCEPTED} and not (
+        action in {ReviewAction.CORRECT, ReviewAction.REJECT}
+        and override
+        and expected_value == item.resolved_value
+    ):
         raise ReviewAlreadyResolved()
     if action is ReviewAction.CORRECT:
         final = (value or "").strip()
         if not final:
             raise InvalidCorrection()
         status = ReviewStatus.CORRECTED
-    else:
+    elif action is ReviewAction.ACCEPT:
         final = item.value
         status = ReviewStatus.ACCEPTED
+    else:
+        final = None
+        status = ReviewStatus.REJECTED
     resolved = ReviewItem(
-        id=item.id, card_key=item.card_key, category_id=item.category_id, title=item.title,
-        attribute=item.attribute, value=item.value, confidence=item.confidence,
-        source=item.source, evidence=item.evidence, status=status, resolved_value=final,
-        created_at=item.created_at, resolved_at=now,
+        id=item.id,
+        card_key=item.card_key,
+        category_id=item.category_id,
+        title=item.title,
+        attribute=item.attribute,
+        value=(item.resolved_value or item.value) if action is ReviewAction.REJECT else item.value,
+        confidence=item.confidence,
+        source=item.source,
+        evidence=item.evidence,
+        status=status,
+        resolved_value=final,
+        created_at=item.created_at,
+        resolved_at=now,
     )
-    alias = Alias(attribute=item.attribute, evidence=item.evidence, value=final, created_at=now)
+    alias = (
+        Alias(
+            attribute=item.attribute,
+            evidence=item.evidence,
+            value=final,
+            created_at=now,
+            category_id=item.category_id,
+            card_key=item.card_key,
+        )
+        if final is not None
+        else None
+    )
     return resolved, alias

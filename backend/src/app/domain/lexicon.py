@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from app.domain.card_text import Token, match_form, tokenize
 from app.domain.profile import AttributeProfile
-from app.domain.values import color_word
+from app.domain.values import canonical_text, color_word, display_value
 
 MIN_ENTRY_CHARS = 2
 
@@ -60,6 +60,18 @@ class Lexicon:
             return 0.0
         return self._priors.get((category, attribute), {}).get(key, 0.0)
 
+    def value_key(self, attribute: str, value: str, unit: str | None = None) -> str:
+        profile = self.profiles.get(attribute)
+        return (
+            profile.value_key(value, unit)
+            if profile
+            else canonical_text(display_value(value, unit))
+        )
+
+    def value_display(self, attribute: str, value: str, unit: str | None = None) -> str:
+        profile = self.profiles.get(attribute)
+        return profile.value_display(value, unit) if profile else display_value(value, unit)
+
     def category_values(self, category: int | None, attribute: str) -> Mapping[str, float]:
         if category is None:
             return {}
@@ -68,9 +80,7 @@ class Lexicon:
     def display(self, attribute: str, key: str) -> str | None:
         return self._display.get((attribute, key))
 
-    def matches(
-        self, tokens: Sequence[Token], attributes: frozenset[str]
-    ) -> Iterator[EntryMatch]:
+    def matches(self, tokens: Sequence[Token], attributes: frozenset[str]) -> Iterator[EntryMatch]:
         normalized = [match_token(t.text) for t in tokens]
         for i, first in enumerate(normalized):
             for entry in self._index.get(first, ()):

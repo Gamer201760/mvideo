@@ -13,12 +13,20 @@ export interface SegmentedOption<T extends string> {
 
 export type SegmentedDisplay = "label" | "icon" | "short"
 
+export type SegmentedTone = "default" | "inverse"
+
+const TONE_CLASS: Readonly<Record<SegmentedTone, string | undefined>> = {
+  default: undefined,
+  inverse: styles.inverse,
+}
+
 export interface SegmentedProps<T extends string> {
   readonly label: string
   readonly options: readonly SegmentedOption<T>[]
   readonly value: T
   readonly onChange: (value: T) => void
   readonly display?: SegmentedDisplay
+  readonly tone?: SegmentedTone
   readonly className?: string | undefined
 }
 
@@ -52,18 +60,19 @@ export function Segmented<T extends string>({
   value,
   onChange,
   display = "label",
+  tone = "default",
   className,
 }: SegmentedProps<T>) {
   const name = useId()
   const modality = useInputModality()
   const { listRef, indicatorRef, itemRef } = useSlidingIndicator<HTMLFieldSetElement>(value, {
     instant: modality.instant,
-    radiusToken: "--radius-md",
+    radiusToken: "--radius-pill",
   })
   return (
     <fieldset
       ref={listRef}
-      className={clsx(styles.segmented, className)}
+      className={clsx(styles.segmented, TONE_CLASS[tone], className)}
       onKeyDown={modality.onKeyDown}
       onPointerDown={modality.onPointerDown}
     >

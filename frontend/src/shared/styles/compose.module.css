@@ -64,3 +64,53 @@
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-body-sm);
 }
+
+.captionText {
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.plainList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inlineList {
+  composes: plainList;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.threadKnot {
+  inline-size: calc(var(--thread-knot) * 2);
+  block-size: calc(var(--thread-knot) * 2);
+  border-radius: var(--radius-pill);
+  background-color: var(--mark-thread);
+}
+
+.threadStroke {
+  fill: none;
+  stroke: var(--mark-thread);
+  stroke-width: var(--thread-width);
+  stroke-linecap: round;
+}
+
+.iconOnlyAction {
+  color: var(--text-secondary);
+}
+
+.dataTable {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-body-sm);
+}
+
+.raisedSurface {
+  border: var(--hairline) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-raised);
+}

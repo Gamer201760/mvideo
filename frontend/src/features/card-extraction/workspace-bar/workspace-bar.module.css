@@ -1,0 +1,41 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12) var(--space-24);
+  animation: var(--motion-fade-in);
+}
+
+.subject {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-columns: auto minmax(0, max-content) auto;
+  align-items: center;
+  justify-content: start;
+  gap: var(--space-8) var(--space-12);
+  min-inline-size: 0;
+}
+
+@media (max-width: 48rem) {
+  .subject {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .subject > :last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+.icon {
+  color: var(--text-muted);
+}
+
+.title {
+  composes: subheadingText from "../../../shared/styles/compose.module.css";
+  min-inline-size: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  outline: none;
+}

@@ -1,0 +1,29 @@
+.visual {
+  display: none;
+  min-inline-size: 0;
+}
+
+.visual[data-paused="true"] [data-card-flow] {
+  animation-play-state: paused;
+}
+
+.caption {
+  composes: captionText from "../../../shared/styles/compose.module.css";
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+@media (min-width: 64rem) {
+  .visual {
+    display: grid;
+    gap: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caption button {
+    display: none;
+  }
+}

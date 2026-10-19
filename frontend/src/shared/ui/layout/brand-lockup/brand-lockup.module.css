@@ -1,0 +1,95 @@
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-on-shell);
+}
+
+.mark {
+  inline-size: var(--brand-mark-width);
+  block-size: var(--brand-mark-height);
+  flex: none;
+}
+
+.markBase {
+  fill: currentColor;
+}
+
+.markBar,
+.markKnot {
+  fill: var(--mark-thread);
+}
+
+.markBar {
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+
+.markKnot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wordmark {
+  font-size: var(--font-size-heading);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  white-space: nowrap;
+}
+
+.knot {
+  position: relative;
+  display: inline-block;
+}
+
+.knot::after {
+  content: "";
+  position: absolute;
+  inset-block-start: var(--brand-knot-offset);
+  inset-inline-start: 50%;
+  inline-size: var(--brand-knot-size);
+  block-size: var(--brand-knot-size);
+  border-radius: var(--radius-pill);
+  background-color: var(--mark-thread);
+  translate: -50% 0;
+}
+
+.partner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-inline-start: var(--space-8);
+}
+
+.prefix {
+  color: var(--text-on-shell-muted);
+  font-size: var(--font-size-label);
+  font-weight: var(--weight-medium);
+}
+
+.partnerLogo {
+  display: block;
+  block-size: var(--brand-partner-height);
+  inline-size: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lockup:hover .markBar {
+    animation: var(--motion-brand-thread);
+  }
+
+  .lockup:hover .markKnot {
+    animation: var(--motion-brand-knot);
+  }
+
+  .lockup:hover .knot::after {
+    animation: var(--motion-brand-hop);
+  }
+}
+
+@media (max-width: 30rem) {
+  .partner {
+    display: none;
+  }
+}

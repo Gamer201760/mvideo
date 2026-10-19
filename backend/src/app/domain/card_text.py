@@ -3,6 +3,8 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from app.domain.text_normalization import matching_text
+
 BLOCK_TAG = re.compile(r"<\s*/?\s*(br|p|li|ul|ol|div|tr|h[1-6])\b[^>]*>", re.IGNORECASE)
 ANY_TAG = re.compile(r"<[^>]{0,200}>")
 SPACES = re.compile(r"[ \t   ]+")
@@ -55,10 +57,7 @@ def clean_text(raw: str | None) -> str:
 
 
 def match_form(text: str) -> str:
-    lowered = text.lower()
-    if len(lowered) != len(text):
-        lowered = "".join(ch.lower() if len(ch.lower()) == 1 else ch for ch in text)
-    return lowered.replace("ё", "е")
+    return matching_text(text)
 
 
 def tokenize(match: str) -> tuple[Token, ...]:

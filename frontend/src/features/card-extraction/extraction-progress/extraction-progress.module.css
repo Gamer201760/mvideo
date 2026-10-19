@@ -1,0 +1,124 @@
+.progress {
+  display: grid;
+  gap: var(--space-12);
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-block-size: var(--icon-lg);
+}
+
+.label {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.scan {
+  position: relative;
+  block-size: var(--scan-height);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--border-subtle);
+}
+
+.beam {
+  display: block;
+  inline-size: calc(var(--scan-ratio) * 100%);
+  block-size: 100%;
+  border-radius: inherit;
+  background-color: var(--mark-thread);
+  opacity: 0;
+  transition: var(--transition-fade);
+}
+
+.scan[data-active="true"] .beam {
+  opacity: 1;
+  animation: var(--motion-scan);
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.list {
+  composes: plainList from "../../../shared/styles/compose.module.css";
+}
+
+.candidate {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--space-32) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-12);
+  min-block-size: var(--target-min);
+  padding: var(--space-12);
+  border-block-start: var(--hairline) solid var(--border-subtle);
+  background-color: var(--surface-raised);
+  transition: var(--transition-dim);
+  animation: var(--motion-rise-in);
+  animation-delay: calc(var(--i) * var(--dur-slow));
+  animation-fill-mode: backwards;
+}
+
+.candidate:first-child {
+  border-block-start-color: transparent;
+}
+
+.candidate[data-reordering="up"] {
+  z-index: var(--layer-raised);
+  background-color: var(--surface-sunken);
+}
+
+.candidate[data-selected="true"] {
+  background-color: var(--surface-evidence);
+}
+
+.candidate[data-decided="true"][data-selected="false"] {
+  opacity: var(--opacity-stale);
+}
+
+.rank {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-variant-numeric: var(--font-numeric);
+}
+
+.category {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  overflow-wrap: anywhere;
+}
+
+.marker {
+  display: inline-flex;
+  min-inline-size: 0;
+}
+
+.selection {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  animation: var(--motion-scale-in);
+}
+
+.knot {
+  composes: threadKnot from "../../../shared/styles/compose.module.css";
+  animation: var(--motion-brand-knot);
+}
+
+@media (max-width: 48rem) {
+  .candidate {
+    grid-template-columns: var(--space-24) minmax(0, 1fr);
+    padding-inline: var(--space-4);
+  }
+
+  .marker {
+    grid-column: 2;
+  }
+
+  .marker:empty {
+    display: none;
+  }
+}

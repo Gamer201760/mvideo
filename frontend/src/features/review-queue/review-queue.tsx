@@ -1,81 +1,60 @@
-import { useResolveReview, useReviewQueue } from "@/entities/stand"
-import { useErrorText, useTranslation } from "@/shared/i18n"
-import { Swap, useLoadingIndicator } from "@/shared/motion"
-import { Card, EmptyState, ErrorState, Skeleton } from "@/shared/ui"
-import styles from "./review-queue.module.css"
-import { ReviewRow } from "./review-row/review-row"
+import {
+  type CardReviewState,
+  type ExtractInput,
+  type ReviewAction,
+  useResolveReview,
+} from "@/entities/stand"
+import { useErrorCopy, useTranslation } from "@/shared/i18n"
+import { Card, ErrorState } from "@/shared/ui"
+import { ReviewItems } from "./review-items/review-items"
 
 export interface ReviewQueueProps {
-  readonly onResolved: () => void
+  readonly card: CardReviewState | undefined
+  readonly onResolved: (card: ExtractInput) => void
 }
 
-type View = "loading" | "error" | "empty" | "data"
-
-function viewOf(isError: boolean, loaded: boolean, count: number): View {
-  if (isError) return "error"
-  if (!loaded) return "loading"
-  return count === 0 ? "empty" : "data"
-}
-
-export function ReviewQueue({ onResolved }: ReviewQueueProps) {
+export function ReviewQueue({ card, onResolved }: ReviewQueueProps) {
   const { t } = useTranslation()
-  const errorText = useErrorText()
-  const query = useReviewQueue()
+  const errorCopy = useErrorCopy()
   const resolve = useResolveReview()
-  const items = query.data?.items ?? []
-  const indicator = useLoadingIndicator({
-    pending: query.isFetching,
-    hasData: query.data !== undefined,
-  })
-  const view = viewOf(query.isError, query.data !== undefined, items.length)
-  const act = (id: string, action: "accept" | "correct", value?: string) =>
-    resolve.mutate({ id, action, value }, { onSuccess: onResolved })
+  const current = card?.items.filter((item) => item.status === "pending") ?? []
+  const act = (id: string, action: ReviewAction, value?: string) =>
+    resolve.mutate(
+      { id, action, value },
+      {
+        onSuccess: ({ card }) => {
+          if (card !== null) onResolved(card)
+        },
+      },
+    )
+
+  if (card === undefined || current.length === 0) return null
 
   return (
     <Card
       title={t("stand:review.title")}
       description={t("stand:review.description")}
-      eyebrow={view === "data" ? t("stand:review.count", { count: items.length }) : undefined}
+      eyebrow={t("stand:review.currentCount", { count: current.length })}
       motionIndex={2}
-      aria-busy={view === "loading" || undefined}
     >
       {resolve.isError ? (
-        <ErrorState title={errorText(resolve.error)} onRetry={() => void query.refetch()} />
+        <ErrorState
+          {...errorCopy(resolve.error)}
+          onRetry={() => {
+            const input = resolve.variables
+            if (input !== undefined) act(input.id, input.action, input.value)
+          }}
+          retryPending={resolve.isPending}
+        />
       ) : null}
-      <Swap swapKey={view} as="div">
-        {view === "loading" ? (
-          <div role="status" aria-label={t("stand:review.loading")}>
-            {indicator === "skeleton" ? <Skeleton lines={3} /> : null}
-          </div>
-        ) : null}
-        {view === "error" ? (
-          <ErrorState
-            title={errorText(query.error)}
-            onRetry={() => void query.refetch()}
-            retryPending={query.isFetching}
-          />
-        ) : null}
-        {view === "empty" ? (
-          <EmptyState
-            icon="review"
-            title={t("stand:review.empty.title")}
-            description={t("stand:review.empty.description")}
-          />
-        ) : null}
-        {view === "data" ? (
-          <ul className={styles.list}>
-            {items.map((item) => (
-              <ReviewRow
-                key={item.id}
-                item={item}
-                pending={resolve.isPending && resolve.variables?.id === item.id}
-                onAccept={() => act(item.id, "accept")}
-                onCorrect={(value) => act(item.id, "correct", value)}
-              />
-            ))}
-          </ul>
-        ) : null}
-      </Swap>
+      {resolve.isSuccess && resolve.data.card === null ? (
+        <p role="status">{t("stand:review.savedWithoutCard")}</p>
+      ) : null}
+      <ReviewItems
+        items={current}
+        pendingId={resolve.isPending ? resolve.variables.id : undefined}
+        onAct={act}
+      />
     </Card>
   )
 }

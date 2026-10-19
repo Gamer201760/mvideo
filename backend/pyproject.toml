@@ -1,38 +1,22 @@
 [project]
-name = "app"
-version = "0.1.0"
+name = "product-attributes"
+version = "0.2.0"
 requires-python = ">=3.12"
-dependencies = [
-    "catboost>=1.2.10",
-    "fastapi>=0.143.1",
-    "httpx>=0.28.1",
-    "pyarrow>=26.0.0",
-    "scikit-learn>=1.9.1",
-    "uvicorn>=0.54.0",
-]
-
-[project.scripts]
-prepare-data = "app.prepare_data:main"
-baseline = "app.run_baseline:main"
-stand-pack = "app.build_stand_pack:main"
-ranker = "app.run_ranker:main"
-decide = "app.run_decision:main"
-twins = "app.run_twins:main"
-infer-categories = "app.run_infer_categories:main"
-shard-cards = "app.run_shard_cards:main"
-final = "app.run_final:main"
-raw-extract = "app.run_raw_extract:main"
+dependencies = ["fastapi>=0.143.1", "httpx>=0.28.1", "scikit-learn>=1.9.1", "uvicorn>=0.54.0", "aiosqlite>=0.21.0"]
 
 [dependency-groups]
-dev = [
-    "mypy>=1.18",
-    "pytest>=8.4",
-    "pytest-xdist>=3.8",
-    "ruff>=0.14",
+benchmark = [
+    "pyarrow==26.0.0",
 ]
-
-[tool.uv]
-default-groups = ["dev"]
+data = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "nbclient>=0.11.0",
+    "nbformat>=5.11.1",
+    "pandas>=3.0.6",
+    "pyarrow==26.0.0",
+]
+dev = ["mypy>=1.18", "pytest>=8.4", "pytest-xdist>=3.8", "ruff>=0.14"]
 
 [build-system]
 requires = ["hatchling"]
@@ -47,7 +31,7 @@ src = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = ["-n", "auto", "--strict-markers"]
+addopts = "--strict-markers"
 
 [tool.mypy]
 strict = true
@@ -55,5 +39,9 @@ mypy_path = "src"
 files = ["src", "tests"]
 
 [[tool.mypy.overrides]]
-module = ["pyarrow", "pyarrow.*", "catboost", "catboost.*", "sklearn", "sklearn.*", "pandas", "pandas.*", "scipy", "scipy.*"]
+module = ["sklearn", "sklearn.*", "scipy", "scipy.*", "threadpoolctl", "pyarrow", "pyarrow.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["nbformat", "nbformat.*", "nbclient", "nbclient.*", "jupyter_client", "jupyter_client.*"]
 ignore_missing_imports = true

@@ -16,10 +16,13 @@ export const UI_DURATION_LIMIT_MS = 300
 export const MAX_BLUR_PX = 2
 export const EASE_IN_TOLERANCE = 0.02
 export const RARE_EVENT_DURATIONS = new Set([
+  "--dur-drawer",
+  "--dur-drawer-exit",
   "--dur-slow",
   "--dur-draw",
   "--dur-spin",
   "--dur-breathe",
+  "--dur-hop",
 ])
 const CUBIC_BEZIER = /cubic-bezier\(([^)]*)\)/g
 const EASE_IN_KEYWORD = /(?<![\w-])ease-in(?![\w-])/

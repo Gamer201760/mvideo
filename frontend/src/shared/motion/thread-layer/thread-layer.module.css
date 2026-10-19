@@ -1,0 +1,28 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: var(--layer-raised);
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.thread,
+.arrow {
+  composes: threadStroke from "../../styles/compose.module.css";
+}
+
+.thread {
+  stroke-dasharray: 1;
+  animation: var(--motion-thread-draw);
+}
+
+.arrow {
+  animation: var(--motion-fade-in);
+  animation-delay: var(--dur-base);
+}
+
+.layer[data-instant="true"] > * {
+  animation: none;
+}
