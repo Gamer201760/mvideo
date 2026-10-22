@@ -14,7 +14,7 @@ interface ExtractionProgressProps {
 export function ExtractionProgress({ candidates, pending, selected }: ExtractionProgressProps) {
   const { t } = useTranslation()
   const { integer } = useFormatters()
-  const ordered = useRankingOrder(candidates, pending, selected)
+  const ordered = useRankingOrder(candidates)
   const itemRef = useReorderMotion(ordered.map((candidate) => candidate.category_id).join(","))
   const decided = selected !== undefined
   const label = decided

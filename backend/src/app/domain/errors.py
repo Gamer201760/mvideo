@@ -12,6 +12,10 @@ class ModelFailure(DomainError):
     code = "model_failure"
     message = "Language model failed"
 
+    def __init__(self, message: str | None = None, *, attempts: int = 1) -> None:
+        self.attempts = attempts
+        super().__init__(message)
+
 
 class ModelCapacity(ModelFailure):
     code = "model_capacity"
@@ -61,3 +65,18 @@ class InvalidQuestion(DomainError):
 class RunNotFound(DomainError):
     code = "run_not_found"
     message = "Extraction run not found"
+
+
+class StorageFailure(DomainError):
+    code = "storage_failure"
+    message = "Storage operation failed"
+
+
+class StorageUnavailable(StorageFailure):
+    code = "storage_unavailable"
+    message = "Storage is unavailable; retry later"
+
+
+class StorageBusy(StorageUnavailable):
+    code = "storage_busy"
+    message = "Storage is busy; retry later"

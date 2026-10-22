@@ -18,6 +18,11 @@ def repository(path: Path) -> Path:
         "frontend/node_modules/library/index.js",
         "backend/.venv/private.txt",
         "backend/data/raw.txt",
+        "reports/technical-checkpoint.md",
+        "docs/acceptance-validation.md",
+        "reports/benchmark-v1.json",
+        "examples/validation/cards.jsonl",
+        "artifacts/validation/predictions.jsonl",
     ):
         target = path / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -46,6 +51,11 @@ def test_export_excludes_credentials_raw_data_and_caches(tmp_path: Path) -> None
     assert not (output / "frontend/node_modules").exists()
     assert not (output / "backend/.venv").exists()
     assert not (output / "backend/data").exists()
+    assert not (output / "reports/technical-checkpoint.md").exists()
+    assert not (output / "docs/acceptance-validation.md").exists()
+    assert (output / "reports/benchmark-v1.json").exists()
+    assert (output / "examples/validation/cards.jsonl").exists()
+    assert (output / "artifacts/validation/predictions.jsonl").exists()
     assert execute(script, "--verify", output).returncode == 0
 
 

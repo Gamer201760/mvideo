@@ -1,3 +1,4 @@
+import re
 from dataclasses import replace
 
 from app.domain.attribute_flow import CatalogField, FieldAnswer
@@ -20,7 +21,8 @@ def normalize_answer(answer: FieldAnswer, field: CatalogField | None) -> FieldAn
         converted = quantity_in_unit(quantity, field.unit) if quantity is not None else None
         if converted is not None:
             value, unit = format_number(converted.number), field.unit
+    elif re.search(r"\b(?:цвет|color|colour)\b", match_form(answer.attribute)):
+        value = canonical_text(value)
     elif field is not None:
-        equivalent = canonical_text if "цвет" in field.attribute.casefold() else match_form
-        value = next((v for v in field.values if equivalent(v) == equivalent(value)), value)
+        value = next((v for v in field.values if match_form(v) == match_form(value)), value)
     return replace(answer, normalized_value=value, normalized_unit=canonical_unit(unit) or unit)

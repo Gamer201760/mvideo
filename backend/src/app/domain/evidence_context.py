@@ -1,5 +1,5 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from app.domain.attribute_flow import CatalogField, FieldAnswer
 from app.domain.card_text import match_form
@@ -9,6 +9,7 @@ from app.domain.evidence_relations import (
     measurement_named,
 )
 from app.domain.evidence_signals import field_forms, words
+from app.domain.evidence_uncertainty import SPECULATION
 from app.domain.evidence_words import contains_value, field_matches, tokens
 from app.domain.values import COLOR_BASES, COLOR_WORDS, canonical_text
 
@@ -74,6 +75,16 @@ def resolve_context(
     right = min((m.start() for m in clauses if m.start() >= relative_end), default=len(sentence))
     local = sentence[left:right].strip()
     inherited = sentence[:left]
+    speculative = SPECULATION.search(match_form(inherited))
+    if speculative and not re.search(r"\w", inherited[speculative.end() :]):
+        return EvidenceContext(local, answer.quote, False, "conditional_support")
+    if any(
+        re.search(rf"(?<!\w){re.escape(match_form(form))}\s*:", match_form(answer.value))
+        for other in fields
+        if other.attribute != answer.attribute
+        for form in field_forms(replace(answer, attribute=other.attribute), other)
+    ):
+        return EvidenceContext(local, answer.quote, False, "field_mismatch")
     compatible = compatibility_field(answer.attribute)
     if compatible and (
         error := compatibility_error(answer, sentence, field_matches(sentence, forms))

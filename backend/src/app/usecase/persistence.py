@@ -4,6 +4,7 @@ from typing import Protocol, Self
 
 from app.domain.attribute_flow import CatalogCandidate, CatalogField
 from app.domain.review import Alias, ReviewItem
+from app.usecase.readiness import ReadinessProbe
 from app.usecase.review_card import CardRepository, ReviewCard
 from app.usecase.run_ports import RunRepository
 from app.usecase.stand_ports import AliasRepository, CardInput, ReviewRepository
@@ -16,6 +17,7 @@ class CatalogRepository(Protocol):
 
 
 class UnitOfWork(Protocol):
+    readiness: ReadinessProbe
     reviews: ReviewRepository
     aliases: AliasRepository
     catalog: CatalogRepository

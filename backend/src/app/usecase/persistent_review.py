@@ -8,11 +8,14 @@ from app.usecase.stand_ports import CardInput
 
 
 class PersistentReview:
-    def __init__(self, factory: UnitOfWorkFactory) -> None:
+    def __init__(
+        self, factory: UnitOfWorkFactory, read_factory: UnitOfWorkFactory | None = None
+    ) -> None:
         self._factory = factory
+        self._read_factory = read_factory or factory
 
     async def card(self, item_id: str) -> ReviewCard:
-        async with self._factory() as unit:
+        async with self._read_factory() as unit:
             item = await unit.reviews.get(item_id)
             card = await unit.cards.get(item.card_key) if item else None
         if card is None:

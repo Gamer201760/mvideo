@@ -112,6 +112,6 @@ def test_repeated_builds_have_same_splits_and_required_metadata(tmp_path: Path) 
     first, second = tmp_path / "first", tmp_path / "second"
     assert command(raw, first).returncode == 0
     assert command(raw, second).returncode == 0
-    for name in ("splits.parquet", "gold.parquet", "required_attributes.parquet"):
+    for name in ("cards.parquet", "splits.parquet", "gold.parquet", "required_attributes.parquet"):
         assert digest(first / name) == digest(second / name)
     assert json.loads((first / "stats.json").read_text())["skus"]["gold_skus"] == 40

@@ -17,13 +17,15 @@ from app.domain.acceptance import AcceptancePolicy
 from app.domain.rule_routing import RuleRoutingPolicy
 from app.repository.memory.catalog_retrieval import CatalogRetrieval
 from app.repository.sqlite.facades import AliasRepository, ReviewRepository
-from app.repository.sqlite.uow import SqliteUnitOfWork
+from app.repository.sqlite.readiness import SqliteReadiness
+from app.repository.sqlite.uow import SqliteReadUnitOfWork, SqliteUnitOfWork
 from app.settings import Settings, load_settings
 from app.usecase.attribute_flow import AttributeFlow, FlowConfig
 from app.usecase.extract_card import BaselineChooser, ExtractCard
 from app.usecase.interface import LanguageModel
 from app.usecase.persistence import UnitOfWorkFactory
 from app.usecase.persistent_review import PersistentReview
+from app.usecase.readiness import Readiness
 from app.usecase.review_queue import ReviewQueue
 from app.usecase.run_history import RunHistory
 from app.usecase.stand_attribute_flow import StandAttributeFlow
@@ -46,7 +48,8 @@ def create_app(settings: Settings | None = None, model: LanguageModel | None = N
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         factory: UnitOfWorkFactory = lambda: SqliteUnitOfWork(config.database)
-        async with factory() as unit:
+        read_factory: UnitOfWorkFactory = lambda: SqliteReadUnitOfWork(config.database)
+        async with read_factory() as unit:
             categories = await unit.catalog.all()
         if not categories:
             raise RuntimeError("Catalog is empty; run migrations and python -m app.seed")
@@ -56,20 +59,37 @@ def create_app(settings: Settings | None = None, model: LanguageModel | None = N
             retrieval = await asyncio.to_thread(CatalogRetrieval, schemas, ())
         language = model or (
             GatewayModel(
-                config.gateway_url, "default", config.gateway_key, timeout_s=config.gateway_timeout
+                config.gateway_url,
+                config.gateway_model,
+                config.gateway_key,
+                timeout_s=config.gateway_timeout,
+                logger=logger,
             )
             if config.gateway_key
             else LocalRulesModel()
         )
-        reviews, aliases = ReviewRepository(factory), AliasRepository(factory)
+        reviews, aliases = (
+            ReviewRepository(factory, read_factory),
+            AliasRepository(factory, read_factory),
+        )
+        fallback = LocalRulesModel() if config.gateway_key and config.gateway_fallback else None
         clock = SystemClock()
-        history = RunHistory(factory, clock, UuidIds())
+        history = RunHistory(factory, clock, UuidIds(), read_store=read_factory)
         await history.recover()
+        acceptance = AcceptancePolicy(config.acceptance_threshold, config.auto_accept)
         app.state.stand = StandServices(
             ExtractCard(
-                pack, aliases, reviews, BaselineChooser(), clock, UuidIds(), factory, retrieval
+                pack,
+                aliases,
+                reviews,
+                BaselineChooser(),
+                clock,
+                UuidIds(),
+                factory,
+                retrieval,
+                acceptance=acceptance,
             ),
-            ReviewQueue(reviews, aliases, clock, PersistentReview(factory)),
+            ReviewQueue(reviews, aliases, clock, PersistentReview(factory, read_factory)),
             StandCatalog(pack, retrieval),
             StandAttributeFlow(
                 AttributeFlow(
@@ -82,17 +102,19 @@ def create_app(settings: Settings | None = None, model: LanguageModel | None = N
                         timeout_s=config.gateway_timeout,
                     ),
                     RuleRoutingPolicy() if config.rules_first else None,
+                    fallback_model=fallback,
                 ),
                 retrieval,
                 store=factory,
-                acceptance=AcceptancePolicy(config.acceptance_threshold, config.auto_accept),
+                acceptance=acceptance,
+                read_store=read_factory,
             ),
             history,
         )
         app.state.runtime = {
             "ready": True,
             "mode": "gateway" if config.gateway_key else "local_rules",
-            "model": "default" if config.gateway_key else None,
+            "model": config.gateway_model if config.gateway_key else None,
             "categories": len(categories),
             "synthetic": True,
             "acceptance_threshold": config.acceptance_threshold,
@@ -101,11 +123,14 @@ def create_app(settings: Settings | None = None, model: LanguageModel | None = N
             "concurrency": config.concurrency,
         }
         app.state.database = config.database
+        app.state.readiness = Readiness(SqliteReadiness(read_factory))
         try:
             yield
         finally:
             if isinstance(language, (GatewayModel, LocalRulesModel)):
                 await language.aclose()
+            if fallback is not None:
+                await fallback.aclose()
 
     app = FastAPI(title="Product attributes", version="0.2.0", lifespan=lifespan)
     ErrorHandlers(logger).register(app)

@@ -8,6 +8,7 @@ from app.domain.attribute_flow import Extraction, FlowCall, FlowCard, FlowOutcom
 from app.domain.errors import ModelFailure
 from app.domain.rule_routing import RuleRoutingPolicy, route_rules
 from app.usecase.attribute_flow_contract import make_request
+from app.usecase.flow_fallback import fallback_reason, run_fallback
 from app.usecase.interface import LanguageModel
 
 
@@ -58,12 +59,14 @@ class AttributeFlow:
         model: LanguageModel,
         config: FlowConfig | None = None,
         rule_policy: RuleRoutingPolicy | None = None,
+        fallback_model: LanguageModel | None = None,
     ) -> None:
         self._model = model
         self._config = config or FlowConfig()
         self._gate = asyncio.Semaphore(self._config.concurrency)
         self._pending = 0
         self._rule_policy = rule_policy
+        self._fallback_model = fallback_model
 
     async def _call(
         self,
@@ -76,14 +79,15 @@ class AttributeFlow:
         error = None
         results: tuple[Extraction, ...] = ()
         dispatched = False
+        attempts = 0
         request = make_request(cards, previous)
         if len(request.prompt) > self._config.max_batch_chars:
             return (), FlowCall(
-                "extract", tuple(c.sku_id for c in cards), 0, 0, None, "input_too_large", False
+                "extract", tuple(c.sku_id for c in cards), 0, 0, None, "input_too_large", False, 0
             )
         if self._pending >= self._config.max_pending:
             return (), FlowCall(
-                "extract", tuple(c.sku_id for c in cards), 0, 0, None, "capacity", False
+                "extract", tuple(c.sku_id for c in cards), 0, 0, None, "capacity", False, 0
             )
         self._pending += 1
         try:
@@ -91,11 +95,24 @@ class AttributeFlow:
                 async with self._gate:
                     started = time.perf_counter()
                     dispatched = True
-                    completion = await self._model.complete(request)
+                    attempts = 1
+                    try:
+                        completion = await self._model.complete(request)
+                    except asyncio.CancelledError as cancelled:
+                        actual = getattr(cancelled, "model_attempts", None)
+                        if isinstance(actual, int):
+                            attempts = actual
+                        raise
                     usage = completion.usage
-                    results = parse_batch(completion.output, cards)
-        except (ModelFailure, TimeoutError, TypeError, ValueError) as exc:
+                    attempts = usage.attempts
+                    try:
+                        results = await asyncio.to_thread(parse_batch, completion.output, cards)
+                    except (TypeError, ValueError) as invalid:
+                        error = type(invalid).__name__
+        except (ModelFailure, TimeoutError) as exc:
             error = type(exc).__name__
+            if isinstance(exc, ModelFailure):
+                attempts = exc.attempts
         finally:
             self._pending -= 1
         record = FlowCall(
@@ -106,8 +123,31 @@ class AttributeFlow:
             usage,
             error,
             dispatched,
+            attempts,
         )
         return results, record
+
+    async def _infer(
+        self, cards: tuple[FlowCard, ...], previous: tuple[Extraction, ...] = ()
+    ) -> tuple[tuple[Extraction, ...], tuple[FlowCall, ...]]:
+        results, call = await self._call(cards, previous)
+        reason = fallback_reason(call)
+        if (
+            results
+            or previous
+            or self._fallback_model is None
+            or reason is None
+            or self._pending >= self._config.max_pending
+        ):
+            return results, (call,)
+        self._pending += 1
+        try:
+            results, local_call = await run_fallback(
+                self._fallback_model, cards, reason, self._gate, self._config.timeout_s
+            )
+        finally:
+            self._pending -= 1
+        return results, (call, local_call)
 
     async def run(
         self,
@@ -120,22 +160,23 @@ class AttributeFlow:
         local: dict[int, Extraction] = {}
         if self._rule_policy is not None:
             for card in cards:
-                decision = route_rules(card, self._rule_policy)
+                decision = await asyncio.to_thread(route_rules, card, self._rule_policy)
                 if decision.extraction is not None:
                     local[card.sku_id] = decision.extraction
 
         async def process(batch: tuple[FlowCard, ...]) -> FlowOutcome:
             pending = tuple(c for c in batch if c.sku_id not in local)
-            extracted, call = await self._call(pending) if pending else ((), None)
+            extracted, batch_calls = await self._infer(pending) if pending else ((), ())
             by_id = {r.sku_id: r for r in extracted} | local
             initial = tuple(by_id[c.sku_id] for c in batch if c.sku_id in by_id)
             first_ready = 1000 * (time.perf_counter() - started)
-            calls = [call] if call is not None else []
+            calls = list(batch_calls)
             targets = tuple(
                 card
                 for card in batch
                 if card.sku_id in by_id
                 and card.sku_id not in local
+                and by_id[card.sku_id].fallback_reason is None
                 and (
                     self._config.audit == "all"
                     or (
@@ -150,11 +191,11 @@ class AttributeFlow:
             final = initial
             if targets:
                 ids = {card.sku_id for card in targets}
-                audited, audit_call = await self._call(
+                audited, audit_calls = await self._infer(
                     targets,
                     tuple(result for result in initial if result.sku_id in ids),
                 )
-                calls.append(audit_call)
+                calls.extend(audit_calls)
                 replacements = {result.sku_id: result for result in audited}
                 final = tuple(replacements.get(result.sku_id, result) for result in initial)
             outcome = FlowOutcome(

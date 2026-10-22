@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends, Request
 from app.controller.stand.dependencies import ERRORS, history_usecase
 from app.controller.stand.flow_response import flow_response
 from app.controller.stand.schemas import (
+    AttributeRiskSchema,
     CategoryPreviewResponse,
     CategorySchema,
+    EvidenceRejectionSchema,
     ExampleSchema,
     ExamplesResponse,
     ExtractedValueSchema,
@@ -142,12 +144,25 @@ async def _extract(
     return ExtractResponse(
         text=result.text,
         threshold=result.threshold,
+        auto_accept_enabled=result.auto_accept_enabled,
         missing=list(result.missing),
+        rejections=[
+            EvidenceRejectionSchema(attribute=r.attribute, reason=r.reason, evidence=r.quote)
+            for r in result.rejections
+        ],
         values=[
             ExtractedValueSchema(
                 attribute=v.attribute,
                 value=v.value,
                 confidence=None if v.source == "review" else v.confidence,
+                risk=AttributeRiskSchema(
+                    level=v.risk.level,
+                    score=v.risk.score,
+                    reasons=list(v.risk.reasons),
+                    method=v.risk.method,
+                )
+                if v.risk is not None and v.source != "review"
+                else None,
                 source=v.source,
                 sources=list(v.sources),
                 evidence=v.evidence,

@@ -107,6 +107,7 @@ class ExtractResponse(BaseModel):
     missing: list[str]
     rejections: list[EvidenceRejectionSchema] = Field(default_factory=list)
     auto_accept_enabled: bool = False
+    fallback_reason: str | None = None
 
 
 class ReviewItemSchema(BaseModel):

@@ -26,7 +26,7 @@ function SourceForm({ pending, onSubmit }: CardSourcesProps) {
   const errorCopy = useErrorCopy()
   const info = useStandInfo()
   const examples = useExamples()
-  const error = info.error ?? examples.error
+  const error = info.error
   if (error !== null) {
     return (
       <Card title={t("stand:form.title")}>
@@ -46,7 +46,7 @@ function SourceForm({ pending, onSubmit }: CardSourcesProps) {
       </Card>
     )
   }
-  if (info.data === undefined || examples.data === undefined) {
+  if (info.data === undefined) {
     return (
       <Card title={t("stand:form.title")} motionIndex={0}>
         <Skeleton lines={5} />
@@ -54,11 +54,22 @@ function SourceForm({ pending, onSubmit }: CardSourcesProps) {
     )
   }
   return (
-    <CardForm
-      categories={info.data.categories}
-      examples={examples.data.items}
-      pending={pending}
-      onSubmit={onSubmit}
-    />
+    <>
+      <CardForm
+        categories={info.data.categories}
+        examples={examples.data?.items ?? []}
+        pending={pending}
+        onSubmit={onSubmit}
+      />
+      {examples.error === null ? null : (
+        <Card title={t("stand:form.example")}>
+          <ErrorState
+            {...errorCopy(examples.error)}
+            onRetry={() => void examples.refetch()}
+            retryPending={examples.isFetching}
+          />
+        </Card>
+      )}
+    </>
   )
 }

@@ -9,6 +9,7 @@ import { useErrorCopy, useFormatters, useTranslation } from "@/shared/i18n"
 import { Swap, ThreadLayer, useLoadingIndicator } from "@/shared/motion"
 import { Button, Card, EmptyState, ErrorState, Skeleton } from "@/shared/ui"
 import { EvidencePanel } from "../evidence-panel/evidence-panel"
+import { FallbackNotice } from "../fallback-notice/fallback-notice"
 import { RejectedFields } from "../rejected-fields/rejected-fields"
 import styles from "./extraction-result.module.css"
 import { useEvidenceDisclosure } from "./use-evidence-disclosure"
@@ -160,12 +161,14 @@ function ResultData({
             : t("stand:result.missingNone")
   return (
     <div className={styles.data}>
+      <FallbackNotice reason={result.fallback_reason} />
       {result.category == null ? null : (
         <p className={styles.category}>
           <span className={styles.label}>{t("stand:result.category")}</span>
           <CategoryPath path={result.category.path} />
         </p>
       )}
+      <p className={styles.missing}>{t("stand:risk.description")}</p>
       <AttributeTable
         values={result.values}
         activeAttribute={focused}

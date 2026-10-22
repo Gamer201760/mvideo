@@ -12,6 +12,8 @@ from app.domain.candidate import (
     parse_range,
 )
 from app.domain.card_text import CardText
+from app.domain.evidence_constraints import identity_field
+from app.domain.key_value_text import SENTENCE_END, key_value_spans
 from app.domain.lexicon import Lexicon
 from app.domain.profile import BRAND, MODEL, AttributeProfile, Kind
 from app.domain.values import (
@@ -76,14 +78,18 @@ def key_value_candidates(
     lexicon: Lexicon,
     category: int | None,
 ) -> Iterator[Candidate]:
-    for line in KEY_VALUE.finditer(card.match):
-        key, value = line.group(1), line.group(2)
-        start, end = line.start(2), line.end(2)
-        zone = card.zone(line.start())
+    for key, raw_value, start, raw_end in key_value_spans(card.match, profiles):
+        zone = card.zone(start)
         source = Source.SELLER if zone == "seller" else Source.KEY_VALUE
         for name in best_attributes(profiles, key, MIN_AFFINITY):
             profile = profiles[name]
             affinity = name_affinity(profile, key)
+            terminal = SENTENCE_END.search(raw_value) if not identity_field(name) else None
+            end = start + terminal.start() if terminal else raw_end
+            value = card.match[start:end].rstrip()
+            end = start + len(value)
+            if not value:
+                continue
             if profile.numeric:
                 quantity = leading_quantity(value, profile.unit)
                 if quantity is None or is_range(value):

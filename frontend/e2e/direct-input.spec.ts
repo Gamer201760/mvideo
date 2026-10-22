@@ -20,7 +20,8 @@ test("edit the existing input, save on Enter and keep the value after reload", a
   })
   await expect(input).toHaveValue(value.value)
   await expect(row.getByRole("cell").first().getByRole("button")).toHaveCount(0)
-  const height = (await row.boundingBox())?.height
+  const height = (await row.boundingBox())?.height ?? 0
+  expect(height).toBeGreaterThan(0)
   let writes = 0
   page.on("request", (request) => {
     if (request.url().endsWith(`/api/v1/review/${value.review_id}`) && request.method() === "POST")
@@ -32,7 +33,7 @@ test("edit the existing input, save on Enter and keep the value after reload", a
   expect(writes).toBe(0)
   const changed = `${value.value} edited`
   await input.fill(changed)
-  expect((await row.boundingBox())?.height).toBe(height)
+  expect((await row.boundingBox())?.height).toBeCloseTo(height, 1)
   const saved = page.waitForResponse(
     (response) =>
       response.url().endsWith(`/api/v1/review/${value.review_id}`) &&

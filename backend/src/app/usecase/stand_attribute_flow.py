@@ -57,13 +57,14 @@ class StandAttributeFlow:
         risk_model: EvidenceRiskModel | None = None,
         store: UnitOfWorkFactory | None = None,
         acceptance: AcceptancePolicy | None = None,
+        read_store: UnitOfWorkFactory | None = None,
     ) -> None:
         self._store = store
         self._flow = flow
         self._retrieval = retrieval
         self._risk_model = risk_model
         self._acceptance = acceptance or AcceptancePolicy()
-        self._reviews = FlowReviews(store, self._acceptance)
+        self._reviews = FlowReviews(store, self._acceptance, read_store)
 
     async def prepare(self, card: CardInput, *, limit: int = 3) -> FlowCard:
         return await asyncio.to_thread(self._prepare, card, limit)
@@ -118,8 +119,12 @@ class StandAttributeFlow:
             category = added_category
             prepared = replace(prepared, candidates=(*candidates, added_category))
         if category is not None and category.category_id >= 0:
-            result = complete_seller_fields(result, category, text, card.seller_params)
-        result = validate_extraction(result, category.fields if category else (), text, category)
+            result = await asyncio.to_thread(
+                complete_seller_fields, result, category, text, card.seller_params
+            )
+        result = await asyncio.to_thread(
+            validate_extraction, result, category.fields if category else (), text, category
+        )
         result = await self._reviews.confirmed(card, result, text, category)
         risk_model = self._risk_model if category and category.category_id >= 0 else None
         risks = await asyncio.to_thread(assess_extraction, prepared, result, risk_model)

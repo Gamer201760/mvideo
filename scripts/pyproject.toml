@@ -1,0 +1,3 @@
+[tool.ruff]
+extend = "../backend/pyproject.toml"
+target-version = "py310"

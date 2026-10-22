@@ -9,6 +9,7 @@ class Settings:
     database: Path = Path("var/app.db")
     gateway_url: str = "https://ai.goatwhistle.ru/v1"
     gateway_key: str = field(default="", repr=False)
+    gateway_model: str = "default"
     gateway_timeout: float = 120
     rules_first: bool = True
     batch_size: int = 4
@@ -17,6 +18,7 @@ class Settings:
     max_pending: int = 8
     acceptance_threshold: float = 0.95
     auto_accept: bool = True
+    gateway_fallback: bool = True
 
     def __post_init__(self) -> None:
         if not 1 <= self.batch_size <= 16 or not 1 <= self.concurrency <= 8:
@@ -41,10 +43,17 @@ def load_settings() -> Settings:
     timeout = float(os.environ.get("GATEWAY_TIMEOUT_S", "120"))
     if not 1 <= timeout <= 180:
         raise ValueError("GATEWAY_TIMEOUT_S must be between 1 and 180")
+    gateway_url = os.environ.get("GATEWAY_URL") or os.environ.get("OPENAI_BASE_URL")
+    gateway_key = os.environ.get("GATEWAY_API_KEY") or (
+        os.environ.get("OPENAI_API_KEY", "") if gateway_url else ""
+    )
     return Settings(
         database=Path(os.environ.get("DATABASE_PATH", "var/app.db")).resolve(),
-        gateway_url=os.environ.get("GATEWAY_URL", "https://ai.goatwhistle.ru/v1"),
-        gateway_key=os.environ.get("GATEWAY_API_KEY", ""),
+        gateway_url=gateway_url or "https://ai.goatwhistle.ru/v1",
+        gateway_key=gateway_key,
+        gateway_model=os.environ.get("GATEWAY_MODEL")
+        or os.environ.get("OPENAI_MODEL")
+        or "default",
         gateway_timeout=timeout,
         rules_first=boolean_setting("RULES_FIRST", "true"),
         batch_size=int(os.environ.get("EXTRACTION_BATCH_SIZE", "4")),
@@ -53,4 +62,5 @@ def load_settings() -> Settings:
         max_pending=int(os.environ.get("EXTRACTION_MAX_PENDING", "8")),
         acceptance_threshold=float(os.environ.get("ACCEPTANCE_THRESHOLD", "0.95")),
         auto_accept=boolean_setting("AUTO_ACCEPT", "true"),
+        gateway_fallback=boolean_setting("GATEWAY_FALLBACK", "true"),
     )

@@ -6,8 +6,16 @@ from app.usecase.stand_ports import Clock, IdGenerator
 
 
 class RunHistory:
-    def __init__(self, store: UnitOfWorkFactory, clock: Clock, ids: IdGenerator) -> None:
+    def __init__(
+        self,
+        store: UnitOfWorkFactory,
+        clock: Clock,
+        ids: IdGenerator,
+        *,
+        read_store: UnitOfWorkFactory | None = None,
+    ) -> None:
         self._store, self._clock, self._ids = store, clock, ids
+        self._read_store = read_store or store
 
     async def begin(self, card: ReviewCard) -> str:
         run = ExtractionRun(self._ids.new(), card, "running", self._clock.now())
@@ -23,14 +31,14 @@ class RunHistory:
             await unit.commit()
 
     async def get(self, identifier: str) -> ExtractionRun:
-        async with self._store() as unit:
+        async with self._read_store() as unit:
             run = await unit.runs.get(identifier)
         if run is None:
             raise RunNotFound()
         return run
 
     async def page(self, offset: int, limit: int) -> tuple[list[ExtractionRun], int]:
-        async with self._store() as unit:
+        async with self._read_store() as unit:
             return await unit.runs.page(offset, limit)
 
     async def recover(self) -> None:

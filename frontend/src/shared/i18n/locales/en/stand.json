@@ -60,7 +60,9 @@
     "uncalibrated": "Not rated",
     "extraTitle": "Additional attributes",
     "categoryUnknown": "Category not detected. Select it manually and retry.",
-    "category": "Category"
+    "category": "Category",
+    "fallbackTitle": "Local rules result",
+    "fallbackDescription": "The model response is unavailable. Local rules extracted these values. Review the result and add missing attributes manually."
   },
   "source": {
     "key_value": "Key and value line",
@@ -75,7 +77,7 @@
   },
   "review": {
     "title": "Current card corrections",
-    "description": "Confirm or edit a value in the table. The decision is saved for this card without extracting it again.",
+    "description": "Confirm, edit or reject a value in the table. The decision is saved for this card without extracting it again.",
     "confidence": "Support score {{value}}",
     "accept": "Accept",
     "correct": "Correct",
@@ -94,7 +96,9 @@
     "quoteLabel": "Exact quote from the card",
     "quoteHint": "Copy the supporting text from the card. This value will be saved as a manual decision.",
     "quoteInvalid": "The quote must match a non-empty passage in the card exactly.",
-    "restoreInline": "Restore: {{attribute}}"
+    "restoreInline": "Restore: {{attribute}}",
+    "reject": "Reject",
+    "rejectInline": "Reject value: {{attribute}}"
   },
   "progress": {
     "candidates": "Product category",
@@ -130,7 +134,8 @@
       "category_field": "Field matches category"
     },
     "meter": "{{level}}, score {{value, number}} of {{max, number}}",
-    "explain": "Why this score: {{attribute}}"
+    "explain": "Why this score: {{attribute}}",
+    "description": "Support score: a heuristic measure of support in the text, not a probability of correctness."
   },
   "rejections": {
     "title": "Omitted after checking the quote",

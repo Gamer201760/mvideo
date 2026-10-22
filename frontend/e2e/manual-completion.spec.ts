@@ -53,22 +53,25 @@ test("add a missing field, reject it, reopen history and restore the manual valu
   await page.reload()
   await expect(row.getByRole("textbox")).toHaveValue(fixture.value)
   await expect(row.getByRole("cell").first().getByRole("button")).toHaveCount(0)
-  const review = await (
-    await request.post("/api/v1/review/card", {
-      data: {
-        engine: "hybrid",
-        title,
-        description: evidence,
-        category_id: initial.category?.category_id,
-      },
+  const rejected = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/v1/review/") &&
+      response.request().method() === "POST" &&
+      response.request().postDataJSON()?.action === "reject",
+  )
+  await row
+    .getByRole("button", {
+      name: copy.review.rejectInline.replace("{{attribute}}", attribute),
+      exact: true,
     })
-  ).json()
-  const item = review.items.find((item: { attribute: string }) => item.attribute === attribute)
-  const rejected = await request.post(`/api/v1/review/${item.id}`, {
-    data: { action: "reject", override: true, expected_value: fixture.value },
+    .click()
+  const response = await rejected
+  expect(response.ok()).toBe(true)
+  expect(response.request().postDataJSON()).toMatchObject({
+    action: "reject",
+    override: true,
+    expected_value: fixture.value,
   })
-  expect(rejected.ok()).toBe(true)
-  await page.reload()
   await expect(row).toHaveCount(0)
   await expect(page.getByRole("region", { name: copy.review.rejectedTitle })).toContainText(
     fixture.value,
@@ -119,15 +122,62 @@ test("reject an automatic decision without a prior manual acceptance", async ({
   if (value === undefined) throw new Error("Missing automatic value")
   const row = attributeRow(page, value.attribute)
   await expect(row.getByRole("cell").first().getByRole("button")).toHaveCount(0)
-  const rejected = await request.post(`/api/v1/review/${value.review_id}`, {
-    data: { action: "reject", override: false },
-  })
-  expect(rejected.ok()).toBe(true)
-  await page.reload()
+  const rejected = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/v1/review/") &&
+      response.request().method() === "POST" &&
+      response.request().postDataJSON()?.action === "reject",
+  )
+  await row
+    .getByRole("button", {
+      name: copy.review.rejectInline.replace("{{attribute}}", value.attribute),
+      exact: true,
+    })
+    .click()
+  const response = await rejected
+  expect(response.ok()).toBe(true)
+  expect(response.request().postDataJSON()).toMatchObject({ action: "reject", override: false })
   await expect(row).toHaveCount(0)
   await page.reload()
   await expect(page.getByRole("region", { name: copy.review.rejectedTitle })).toContainText(
     value.attribute,
   )
   await expect(row).toHaveCount(0)
+})
+
+test("reject a pending value directly from the table and restore it", async ({ page, request }) => {
+  const card = await example(request)
+  await fillCard(page, `${card.title} reject pending ${Date.now()}`, card.description)
+  const result = await submitCard(page)
+  const value = result.values.find(
+    (value) => value.acceptance === "review" && value.review_id !== null,
+  )
+  if (value === undefined) throw new Error("Missing pending value")
+  const row = attributeRow(page, value.attribute)
+  const rejected = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/api/v1/review/${value.review_id}`) &&
+      response.request().method() === "POST",
+  )
+  await row
+    .getByRole("button", {
+      name: copy.review.rejectInline.replace("{{attribute}}", value.attribute),
+      exact: true,
+    })
+    .click()
+  const response = await rejected
+  expect(response.ok()).toBe(true)
+  expect(response.request().postDataJSON()).toMatchObject({ action: "reject", override: false })
+  await expect(row).toHaveCount(0)
+  await expect(page.locator("[data-review-summary]")).toBeFocused()
+  await page.reload()
+  await expect(row).toHaveCount(0)
+  await page
+    .getByRole("button", {
+      name: copy.review.restoreInline.replace("{{attribute}}", value.attribute),
+      exact: true,
+    })
+    .click()
+  await expect(row.getByRole("textbox")).toHaveValue(value.value)
+  await expect(row).toContainText(copy.result.status.accepted)
 })

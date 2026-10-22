@@ -20,6 +20,7 @@ from app.domain.evidence_context import (
 from app.domain.evidence_lists import list_evidence
 from app.domain.evidence_quantities import RANGE, numeric_error, scalar
 from app.domain.evidence_signals import field_forms
+from app.domain.evidence_uncertainty import uncertainty_error
 from app.domain.evidence_words import contains_value
 
 
@@ -60,6 +61,9 @@ def evidence_error(
     )
     if context.error:
         return context.error
+    error = uncertainty_error(context.text, numeric=numeric)
+    if error:
+        return error
     if not numeric or not RANGE.search(match_form(answer.value)):
         error = negation_error(answer, context, forms)
         if error:

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from app.domain.attribute_flow import CatalogField, FieldAnswer
 from app.domain.card_text import match_form
 from app.domain.evidence_counts import count_evidence
-from app.domain.evidence_quantity_text import quantity_fragments
+from app.domain.evidence_quantity_text import QUALIFIER, quantity_fragments
 from app.domain.evidence_signals import field_forms
 from app.domain.evidence_words import field_matches
 from app.domain.values import NUMBER, Quantity, leading_quantity, quantity_in_unit
@@ -15,11 +15,14 @@ NUMBERS = re.compile(rf"(?<![\w.,]){SIGNED}")
 INTERVAL = re.compile(
     rf"^\s*(?:от\s*)?({SIGNED})\s*([^\d]*?)\s*(?:[-–—…]|до)\s*({SIGNED})\s*(.*?)\s*$"
 )
-LIMIT = re.compile(
-    rf"^\s*(не более|не менее|до|от|более|менее|свыше|около)\s*({SIGNED})\s*(.*?)\s*$"
-)
-RANGE = re.compile(rf"\b(?:до|от|более|менее|свыше|около)\s*{SIGNED}|{SIGNED}\s*[-–—…]\s*{SIGNED}")
-MODES = {"не более": "max", "до": "max", "не менее": "min", "от": "min", "свыше": "more"}
+LIMIT = re.compile(rf"^\s*({QUALIFIER})\s*({SIGNED})\s*(.*?)\s*$")
+RANGE = re.compile(rf"(?<!\w)(?:{QUALIFIER})\s*{SIGNED}|{SIGNED}\s*[-–—…]\s*{SIGNED}")
+MODES = {
+    **dict.fromkeys(("не более", "не более чем", "до", "максимум", "как максимум", "≤"), "max"),
+    **dict.fromkeys(("не менее", "не менее чем", "от", "минимум", "как минимум", "≥"), "min"),
+    **dict.fromkeys(("свыше", "более", "больше", ">"), "more"),
+    **dict.fromkeys(("менее", "меньше", "<"), "less"),
+}
 
 
 @dataclass(frozen=True, slots=True)

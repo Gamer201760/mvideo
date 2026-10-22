@@ -138,7 +138,7 @@ class ParquetDatasetStore:
         text_keys = pa.table({"sku_id": text_ids, "text_row": pa.array(range(texts.num_rows))})
         keys = text_keys.join(offer_keys, "sku_id", join_type="full outer")
         matched = keys.filter(pc.is_valid(keys.column("text_row"))).sort_by("text_row")
-        orphans = keys.filter(pc.is_null(keys.column("text_row")))
+        orphans = keys.filter(pc.is_null(keys.column("text_row"))).sort_by("offer_row")
         offer_columns = [n for n in offers.column_names if n != "sku_id"]
 
         def part(

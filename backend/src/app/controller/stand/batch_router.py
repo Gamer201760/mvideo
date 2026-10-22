@@ -1,4 +1,5 @@
 import time
+from contextlib import suppress
 from typing import Annotated, Literal, cast
 
 from fastapi import APIRouter, Depends, Request
@@ -14,7 +15,7 @@ from app.controller.stand.dependencies import ERRORS, history_usecase
 from app.controller.stand.flow_response import flow_response
 from app.controller.stand.router import flow_usecase
 from app.domain.card_text import SellerParam
-from app.domain.errors import ModelFailure
+from app.domain.errors import DomainError, ModelFailure
 from app.usecase.batch_extraction import BatchExtraction
 from app.usecase.review_card import ReviewCard
 from app.usecase.run_history import RunHistory
@@ -58,7 +59,13 @@ async def extract_batch(
                 else None
             )
             identifier = identifiers[item.index]
-            await history.finish(identifier, response.model_dump_json() if response else None)
+            try:
+                await history.finish(identifier, response.model_dump_json() if response else None)
+            except DomainError as failure:
+                response = None
+                error = ErrorResponse(code=failure.code, message=type(failure).message)
+                with suppress(DomainError):
+                    await history.finish(identifier, None)
             finished.add(identifier)
             items.append(
                 BatchItemResponse(
@@ -72,7 +79,8 @@ async def extract_batch(
     finally:
         for identifier in identifiers:
             if identifier not in finished:
-                await history.finish(identifier, None)
+                with suppress(DomainError):
+                    await history.finish(identifier, None)
     calls = [call for call in batch.calls if call.dispatched]
     provider_cards = {index for call in calls for index in call.sku_ids}
     succeeded = sum(item.status == "completed" for item in items)
@@ -84,7 +92,7 @@ async def extract_batch(
             requested=len(cards),
             succeeded=succeeded,
             failed=len(cards) - succeeded,
-            provider_requests=len(calls),
+            provider_requests=sum(call.attempts for call in calls),
             provider_cards=len(provider_cards),
             rules_only_cards=sum(
                 item.result is not None and item.index not in provider_cards for item in batch.items

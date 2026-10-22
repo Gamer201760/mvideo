@@ -70,8 +70,9 @@ def parse_extraction(
                 if attribute not in allowed:
                     raise ValueError("field is outside selected category")
                 target = answers
-            elif isinstance(field, str) and field.strip() and field.strip() not in allowed:
-                attribute, target = field.strip(), extras
+            elif isinstance(field, str) and field.strip():
+                attribute = field.strip()
+                target = answers if attribute in allowed else extras
             else:
                 raise ValueError("invalid field index or extra field name")
             if attribute in answers or attribute in extras or attribute in duplicates:

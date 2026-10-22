@@ -14,14 +14,15 @@ from app.domain.errors import (
 
 def flow_failure(calls: Sequence[FlowCall]) -> ModelFailure:
     errors = {call.error for call in calls}
+    attempts = sum(call.attempts for call in calls if call.dispatched)
     if "capacity" in errors:
-        return ModelCapacity()
+        return ModelCapacity(attempts=attempts)
     if "TimeoutError" in errors:
-        return ModelTimeout()
+        return ModelTimeout(attempts=attempts)
     if "input_too_large" in errors:
-        return ModelInputTooLarge()
+        return ModelInputTooLarge(attempts=attempts)
     if errors & {"TypeError", "ValueError"}:
-        return InvalidModelOutput()
+        return InvalidModelOutput(attempts=attempts)
     for failure in (
         ModelCapacity,
         ModelTimeout,
@@ -31,5 +32,5 @@ def flow_failure(calls: Sequence[FlowCall]) -> ModelFailure:
         ModelInputTooLarge,
     ):
         if failure.__name__ in errors or failure.code in errors:
-            return failure()
-    return ModelFailure()
+            return failure(attempts=attempts)
+    return ModelFailure(attempts=attempts)

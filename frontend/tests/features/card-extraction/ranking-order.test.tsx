@@ -21,39 +21,32 @@ describe("useRankingOrder", () => {
   })
   afterEach(() => vi.useRealTimers())
 
-  it("changes presentation order while preserving the real candidate set", () => {
-    const { result } = renderHook(() => useRankingOrder(candidates, true, undefined))
+  it("preserves the API ranking during waiting", () => {
+    const { result } = renderHook(() => useRankingOrder(candidates))
     act(() => vi.advanceTimersByTime(2400))
-    expect(ids(result.current)).not.toEqual(ids(candidates))
+    expect(ids(result.current)).toEqual(ids(candidates))
     expect([...ids(result.current)].sort()).toEqual(ids(candidates))
     expect(ids(candidates)).toEqual([1, 2, 3, 4, 5])
   })
 
-  it("puts the actual selection first and stops reshuffling", () => {
-    const { result, rerender } = renderHook(
-      ({ pending, selected }: { pending: boolean; selected: number | undefined }) =>
-        useRankingOrder(candidates, pending, selected),
-      { initialProps: { pending: true, selected: undefined as number | undefined } },
-    )
-    act(() => vi.advanceTimersByTime(2400))
-    rerender({ pending: false, selected: 4 })
-    const selectedOrder = ids(result.current)
-    expect(selectedOrder).toEqual([4, 1, 2, 3, 5])
-    act(() => vi.advanceTimersByTime(10000))
-    expect(ids(result.current)).toEqual(selectedOrder)
+  it("follows a fresh API ranking without inventing positions", () => {
+    const { result, rerender } = renderHook(({ rows }) => useRankingOrder(rows), {
+      initialProps: { rows: candidates },
+    })
+    rerender({ rows: [...candidates].reverse() })
+    expect(ids(result.current)).toEqual([5, 4, 3, 2, 1])
   })
 
   it("keeps retrieval order with reduced motion", () => {
     setReducedMotion(true)
-    const { result } = renderHook(() => useRankingOrder(candidates, true, undefined))
+    const { result } = renderHook(() => useRankingOrder(candidates))
     act(() => vi.advanceTimersByTime(10000))
     expect(ids(result.current)).toEqual(ids(candidates))
   })
 
   it("handles no candidates and a manual single category", () => {
     const { result, rerender } = renderHook(
-      ({ rows }: { rows: readonly StandCategory[] | undefined }) =>
-        useRankingOrder(rows, true, undefined),
+      ({ rows }: { rows: readonly StandCategory[] | undefined }) => useRankingOrder(rows),
       { initialProps: { rows: undefined as readonly StandCategory[] | undefined } },
     )
     expect(result.current).toEqual([])

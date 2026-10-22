@@ -1,0 +1,12 @@
+.notice {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-8);
+  min-inline-size: 0;
+}
+
+.description {
+  composes: secondaryText from "../../../shared/styles/compose.module.css";
+  margin: 0;
+  max-inline-size: var(--prose-measure);
+}

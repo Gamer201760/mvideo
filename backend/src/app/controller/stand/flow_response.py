@@ -53,6 +53,7 @@ def flow_response(result: StandFlowResult) -> ExtractResponse:
         text=result.text,
         threshold=result.threshold,
         auto_accept_enabled=result.auto_accept_enabled,
+        fallback_reason=result.extraction.fallback_reason,
         values=values,
         extra_values=extras,
         missing=list(result.missing),

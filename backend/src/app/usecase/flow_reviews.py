@@ -16,16 +16,22 @@ from app.usecase.stand_ports import CardInput
 
 
 class FlowReviews:
-    def __init__(self, store: UnitOfWorkFactory | None, policy: AcceptancePolicy) -> None:
+    def __init__(
+        self,
+        store: UnitOfWorkFactory | None,
+        policy: AcceptancePolicy,
+        read_store: UnitOfWorkFactory | None = None,
+    ) -> None:
         self._store, self._policy = store, policy
+        self._read_store = read_store or store
 
     async def confirmed(
         self, card: CardInput, result: Extraction, text: str, category: CatalogCandidate | None
     ) -> Extraction:
-        if self._store is None:
+        if self._read_store is None:
             return result
         key = card_key(replace(card, category_id=result.category_id))
-        async with self._store() as unit:
+        async with self._read_store() as unit:
             page = await unit.reviews.page(ReviewQuery(card_key=key, limit=None))
         decisions = latest_decisions(page.items)
         rejected = {a for a, d in decisions.items() if d.status is ReviewStatus.REJECTED}
@@ -95,6 +101,8 @@ class FlowReviews:
                 alias = aliases.get((answer.attribute, evidence_form(answer.quote)))
                 if alias is not None:
                     confirmed[answer.attribute] = alias.value
+                    if decision is not None:
+                        ids[answer.attribute] = decision.id
                     automatic.discard(answer.attribute)
                     continue
                 risk = assessments.get(answer.attribute)

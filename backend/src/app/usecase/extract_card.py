@@ -1,33 +1,20 @@
 import asyncio
-import hashlib
-import json
-from collections.abc import Mapping, Sequence
-from dataclasses import replace
+from collections.abc import Sequence
 
-from app.domain.candidate import Candidate
+from app.domain.acceptance import AcceptancePolicy
 from app.domain.lexicon import Lexicon
-from app.domain.review import (
-    REVIEW_CONFIDENCE,
-    REVIEW_SOURCE,
-    Alias,
-    ReviewItem,
-    ReviewStatus,
-    StandUnavailable,
-    UnknownCategory,
-    alias_entry,
-    evidence_form,
-)
+from app.domain.review import Alias, StandUnavailable, UnknownCategory, alias_entry
 from app.domain.review_decisions import latest_decisions
-from app.domain.scoring import Pick
 from app.usecase.baseline_ports import CardRecord
-from app.usecase.card_result import CardResult, ExtractedValue
+from app.usecase.card_identity import card_key
+from app.usecase.card_result import CardResult
 from app.usecase.catalog_pack import catalog_pack
 from app.usecase.catalog_schemas import CatalogSchemas
 from app.usecase.extraction import CardExtraction, RequiredAttributes, extract_card
 from app.usecase.persistence import UnitOfWorkFactory
-from app.usecase.review_card import ReviewCard
 from app.usecase.review_query import ReviewQuery
-from app.usecase.rule_reviews import apply_decisions
+from app.usecase.rule_assessment import assess_rules
+from app.usecase.rule_recording import RuleRecording
 from app.usecase.stand_ports import (
     AliasRepository,
     CandidateChooser,
@@ -37,6 +24,8 @@ from app.usecase.stand_ports import (
     ReviewRepository,
     StandPack,
 )
+
+__all__ = ["BaselineChooser", "ExtractCard", "card_key"]
 
 
 class BaselineChooser:
@@ -61,14 +50,14 @@ class ExtractCard:
         ids: IdGenerator,
         store: UnitOfWorkFactory | None = None,
         schemas: CatalogSchemas | None = None,
+        acceptance: AcceptancePolicy | None = None,
     ) -> None:
         self._pack = pack
         self._aliases = aliases
         self._reviews = reviews
         self._chooser = chooser
-        self._clock = clock
-        self._ids = ids
-        self._store = store
+        self._acceptance = acceptance or AcceptancePolicy()
+        self._recording = RuleRecording(reviews, clock, ids, store, self._acceptance)
         self._schemas = schemas
         self._cache: tuple[StandPack, tuple[Alias, ...], Lexicon, RequiredAttributes] | None = None
 
@@ -80,7 +69,7 @@ class ExtractCard:
             raise UnknownCategory()
         page = await self._reviews.page(ReviewQuery(card_key=card_key(card), limit=None))
         decisions = latest_decisions(page.items)
-        rejected = {a for a, d in decisions.items() if d.status is ReviewStatus.REJECTED}
+        rejected = {a for a, d in decisions.items() if d.resolved_value is None}
         aliases = [
             a
             for a in await self._aliases.all()
@@ -99,26 +88,17 @@ class ExtractCard:
             a for a in extraction.profiles if lexicon.category_values(card.category_id, a)
         )
         extraction = await self._chooser.choose(extraction, pack.threshold, card.category_id, known)
-        if self._store is not None:
-            async with self._store() as unit:
-                await unit.cards.save(card_key(card), ReviewCard(card, "rules"))
-                await unit.commit()
-        confirmed = {(a.attribute, evidence_form(a.evidence)): a for a in aliases}
-        values = []
-        for name in sorted(extraction.profiles):
-            if name in rejected:
-                continue
-            value = await self._value(card, name, extraction, confirmed)
-            if value is not None:
-                values.append(value)
-        values = apply_decisions(values, decisions, extraction.text.text)
+        assessment = await asyncio.to_thread(assess_rules, card, extraction, self._schemas)
+        values = await self._recording.record(card, extraction, assessment, aliases)
         found = {v.attribute for v in values}
         missing = tuple(n for n in sorted(extraction.profiles) if n not in found)
         return CardResult(
             text=extraction.text.text,
-            threshold=pack.threshold,
+            threshold=self._acceptance.threshold,
             values=tuple(values),
             missing=missing,
+            rejections=tuple(r for r in assessment.rejections if r.attribute not in found),
+            auto_accept_enabled=self._acceptance.enabled,
         )
 
     def _require_pack(self) -> StandPack:
@@ -160,90 +140,3 @@ class ExtractCard:
         required = RequiredAttributes(pack.required, lexicon)
         self._cache = (pack, version, lexicon, required)
         return lexicon, required
-
-    async def _value(
-        self,
-        card: CardInput,
-        name: str,
-        extraction: CardExtraction,
-        confirmed: Mapping[tuple[str, str], Alias],
-    ) -> ExtractedValue | None:
-        for candidate in extraction.candidates:
-            alias = confirmed.get((name, evidence_form(candidate.evidence)))
-            if candidate.attribute == name and alias is not None:
-                return _reviewed(candidate, alias)
-        pick = extraction.picks.get(name)
-        if pick is not None:
-            item = await self._reviews.upsert_pending(
-                replace(self._item(card, name, pick), status=ReviewStatus.AUTO_ACCEPTED)
-            )
-            return _from_pick(name, pick, item.id, in_review=False)
-        pending = extraction.review.get(name)
-        if pending is None:
-            return None
-        item = await self._reviews.upsert_pending(self._item(card, name, pending))
-        return _from_pick(name, pending, item.id)
-
-    def _item(self, card: CardInput, name: str, pick: Pick) -> ReviewItem:
-        return ReviewItem(
-            id=self._ids.new(),
-            card_key=card_key(card),
-            category_id=card.category_id,
-            title=card.title,
-            attribute=name,
-            value=pick.candidate.value,
-            confidence=pick.confidence,
-            source=pick.candidate.source,
-            evidence=pick.candidate.evidence,
-            status=ReviewStatus.PENDING,
-            resolved_value=None,
-            created_at=self._clock.now(),
-            resolved_at=None,
-        )
-
-
-def card_key(card: CardInput) -> str:
-    raw = json.dumps(
-        [
-            card.title,
-            card.description,
-            card.category_id,
-            [(p.name, p.value, p.unit) for p in card.seller_params],
-        ],
-        ensure_ascii=False,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
-
-
-def _reviewed(candidate: Candidate, alias: Alias) -> ExtractedValue:
-    return ExtractedValue(
-        attribute=candidate.attribute,
-        value=alias.value,
-        confidence=REVIEW_CONFIDENCE,
-        source=REVIEW_SOURCE,
-        sources=(REVIEW_SOURCE, candidate.source),
-        evidence=candidate.evidence,
-        start=candidate.start,
-        end=candidate.end,
-        in_review=False,
-        review_id=None,
-    )
-
-
-def _from_pick(
-    name: str, pick: Pick, review_id: str | None, *, in_review: bool | None = None
-) -> ExtractedValue:
-    c = pick.candidate
-    return ExtractedValue(
-        attribute=name,
-        value=c.value,
-        confidence=pick.confidence,
-        source=c.source,
-        sources=pick.sources,
-        evidence=c.evidence,
-        start=c.start,
-        end=c.end,
-        in_review=review_id is not None if in_review is None else in_review,
-        review_id=review_id,
-    )

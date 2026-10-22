@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 
+from app.domain.errors import StorageFailure
 from app.domain.review import ReviewItem, ReviewStatus
 from app.repository.sqlite.uow import SqliteUnitOfWork
 from app.usecase.persistent_review import PersistentReview
@@ -50,7 +51,7 @@ def test_main_mode_review_survives_restart_before_and_after_correction(database:
             assert color["value"] == "голубой"
             assert color["source"] == "review"
             assert color["status"] == "accepted"
-            assert color["review_id"] is None
+            assert color["review_id"] == identifier
             pending = (await client.get("/api/v1/review", params={"status": "pending"})).json()
             assert all(item["id"] != identifier for item in pending["items"])
             history = (await client.get("/api/v1/review", params={"status": "corrected"})).json()
@@ -88,7 +89,7 @@ def test_review_and_alias_writes_roll_back_atomically(database: Path) -> None:
                 "BEGIN SELECT RAISE(ABORT, 'forced write failure'); END"
             )
         service = PersistentReview(lambda: SqliteUnitOfWork(database))
-        with pytest.raises(sqlite3.IntegrityError, match="forced write failure"):
+        with pytest.raises(StorageFailure, match="Storage operation failed"):
             await service.resolve("pending", "correct", "голубой", datetime.now(UTC))
         async with SqliteUnitOfWork(database) as unit:
             assert await unit.reviews.get("pending") == item
@@ -142,7 +143,7 @@ def test_human_override_survives_restart_changed_quote_and_abstention(database: 
                 assert color["status"] == "accepted"
                 assert color["source"] == "review"
                 assert color["evidence"] == "Цвет: синий"
-                assert color["review_id"] is None
+                assert color["review_id"] == identifier
                 assert "Цвет" not in response.json()["missing"]
             reviews = (await client.get("/api/v1/review")).json()["items"]
             assert len(reviews) == 1

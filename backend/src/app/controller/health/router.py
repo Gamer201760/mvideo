@@ -3,6 +3,9 @@ from typing import Literal
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
+from app.controller.errors import ErrorResponse
+from app.usecase.readiness import Readiness
+
 router = APIRouter(tags=["health"])
 
 
@@ -23,8 +26,10 @@ async def health() -> HealthResponse:
     return HealthResponse()
 
 
-@router.get("/ready", response_model=ReadinessResponse)
+@router.get("/ready", response_model=ReadinessResponse, responses={503: {"model": ErrorResponse}})
 async def ready(request: Request) -> ReadinessResponse:
+    readiness: Readiness = request.app.state.readiness
+    await readiness.check()
     runtime = {
         **request.app.state.runtime,
         "categories": len(request.app.state.stand.catalog.info().categories),

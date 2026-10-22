@@ -70,6 +70,7 @@ class Extraction:
     validation_errors: tuple[str, ...] = ()
     proposed_category: str | None = None
     rejections: tuple[EvidenceRejection, ...] = ()
+    fallback_reason: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +82,7 @@ class FlowCall:
     usage: Usage | None
     error: str | None = None
     dispatched: bool = True
+    attempts: int = 1
 
 
 @dataclass(frozen=True, slots=True)

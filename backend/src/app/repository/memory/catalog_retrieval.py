@@ -4,6 +4,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from threading import RLock
 
+import numpy as np
+from numpy.typing import NDArray
 from scipy.sparse import vstack
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -25,6 +27,10 @@ class CatalogRetrieval:
         self._lock = RLock()
         self._added: set[int] = {c for c in schemas if c < 0}
         self._category_rows = {category: row for row, category in enumerate(schemas)}
+        self._leaf_rows: dict[str, set[int]] = defaultdict(set)
+        self._row_leaves: dict[int, str] = {}
+        for category in schemas:
+            self._index_leaf(category)
         self._paths = {match_form(c.path).strip(): c.category_id for c in schemas.values()}
         self._products = products
         self._ids = list(schemas)
@@ -47,6 +53,20 @@ class CatalogRetrieval:
     def retrieve(self, text: str, k: int = 3) -> tuple[CatalogCandidate, ...]:
         with self._lock:
             return self._retrieve(text, k)
+
+    def retrieve_many(
+        self, texts: Sequence[str], k: int = 3
+    ) -> tuple[tuple[CatalogCandidate, ...], ...]:
+        if k < 1:
+            raise ValueError("top k must be positive")
+        if not texts:
+            return ()
+        with self._lock:
+            queries = self._vectorizer.transform(
+                [text.splitlines()[0][:240] if text.splitlines() else text[:240] for text in texts]
+            )
+            scores = (self._matrix @ queries.T).toarray()
+            return tuple(self._rank(text, scores[:, index], k) for index, text in enumerate(texts))
 
     def snapshot(self) -> tuple[CatalogCandidate, ...]:
         with self._lock:
@@ -81,6 +101,7 @@ class CatalogRetrieval:
                 merged.setdefault(match_form(field.attribute), field)
             result = CatalogCandidate(category, path, 0, tuple(merged.values()))
             self._schemas[category] = result
+            self._index_leaf(category)
             self._snapshot = tuple(self._schemas.values())
             return result
 
@@ -99,10 +120,25 @@ class CatalogRetrieval:
                 self._category_rows[identifier] = len(self._ids)
                 self._ids.append(identifier)
             self._schemas[identifier] = category
+            self._index_leaf(identifier)
             self._snapshot = tuple(self._schemas.values())
             self._paths[match_form(category.path).strip()] = identifier
             if identifier < 0:
                 self._added.add(identifier)
+
+    def _index_leaf(self, category: int) -> None:
+        row = self._category_rows[category]
+        previous = self._row_leaves.get(row)
+        if previous is not None:
+            self._leaf_rows[previous].discard(row)
+            if not self._leaf_rows[previous]:
+                del self._leaf_rows[previous]
+        leaf = re.sub(
+            r"[^a-zа-я0-9]+", " ", self._schemas[category].path.split("/")[-1].casefold()
+        ).strip()
+        self._row_leaves[row] = leaf
+        if leaf:
+            self._leaf_rows[leaf].add(row)
 
     def _retrieve(self, text: str, k: int) -> tuple[CatalogCandidate, ...]:
         if k < 1:
@@ -111,11 +147,13 @@ class CatalogRetrieval:
             [text.splitlines()[0][:240] if text.splitlines() else text[:240]]
         )
         scores = (self._matrix @ query.T).toarray().ravel()
+        return self._rank(text, scores, k)
+
+    def _rank(self, text: str, scores: NDArray[np.float64], k: int) -> tuple[CatalogCandidate, ...]:
         title = re.sub(r"[^a-zа-я0-9]+", " ", text.splitlines()[0].casefold()).strip()
-        for category, row in self._category_rows.items():
-            schema = self._schemas[category]
-            leaf = re.sub(r"[^a-zа-я0-9]+", " ", schema.path.split("/")[-1].casefold()).strip()
-            if leaf and (title == leaf or title.startswith(leaf + " ")):
+        words = title.split()
+        for length in range(1, len(words) + 1):
+            for row in self._leaf_rows.get(" ".join(words[:length]), ()):
                 scores[row] += 1
         ranked = scores.argsort()[::-1]
         found: list[CatalogCandidate] = []

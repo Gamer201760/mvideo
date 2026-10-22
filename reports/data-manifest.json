@@ -1,6 +1,6 @@
 {
   "version": "organizer-dataset-v1",
-  "created_at": "2026-10-19T08:37:42.563974+00:00",
+  "created_at": "2026-10-20T12:15:07.913854+00:00",
   "sources": {
     "sku_desc.parquet": {
       "sha256": "08af4442a87dd2d0e50d80aae4371b12d72d9f82adfeffeca3c0fff5595bc67d",
@@ -17,9 +17,9 @@
   },
   "outputs": {
     "cards.parquet": {
-      "sha256": "ad2f7a94535fac5f9e10474d2009ec26006974ed8c61514523d5c42713a0a2d0",
+      "sha256": "48c657ab104814e6970f6bb88912d2931ec978a30ae12e0b636ded4efb5d59d0",
       "rows": 1481914,
-      "bytes": 801583273
+      "bytes": 799228879
     },
     "categories.parquet": {
       "sha256": "d37b49b183ad01221634c7b81b08114cabc1ef754f4cf8bcd7682ce7e188826a",
@@ -70,7 +70,7 @@
     "values_per_attribute": 300
   },
   "threads": 2,
-  "peak_rss_mib": 4452.390625,
+  "peak_rss_mib": 3389.875,
   "gold_policy": "*_search plus catalog vendor/model; never copied into seller input",
   "metadata_policy": "Required fields/weights use catalog and traffic metadata across splits; not claimed train-only",
   "model_calls": 0

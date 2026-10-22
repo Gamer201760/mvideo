@@ -57,7 +57,7 @@ def test_gateway_failure_survives_transport_flow_api_and_failed_history(
             assert response.status_code == status
             assert response.json()["code"] == code
             assert "private" not in response.text and "gateway.example" not in response.text
-            assert calls == 1
+            assert calls == (2 if failure in {"connect", "overload", "unavailable"} else 1)
             runs = (await client.get("/api/v1/runs")).json()["items"]
             assert len(runs) == 1 and runs[0]["status"] == "failed"
             saved = await client.get(f"/api/v1/runs/{runs[0]['id']}")

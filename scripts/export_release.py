@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +19,8 @@ INCLUDE = (
     "docs",
     "notebooks",
     "reports",
+    "examples",
+    "artifacts",
     "scripts",
 )
 EXCLUDE = frozenset(
@@ -62,6 +64,7 @@ SUFFIXES = (
     ".sqlite-wal",
     ".sqlite-shm",
 )
+INTERNAL_DOCUMENTS = frozenset({"reports/technical-checkpoint.md", "docs/acceptance-validation.md"})
 
 
 def fingerprint(path: Path) -> str:
@@ -82,9 +85,7 @@ def files() -> Iterator[Path]:
             continue
         for directory, directories, filenames in os.walk(path, followlinks=False):
             directories[:] = sorted(
-                d
-                for d in directories
-                if d not in EXCLUDE and not d.endswith(".egg-info")
+                d for d in directories if d not in EXCLUDE and not d.endswith(".egg-info")
             )
             for filename in sorted(filenames):
                 if filename in {".DS_Store", "AGENTS.md", "CLAUDE.md"}:
@@ -93,7 +94,9 @@ def files() -> Iterator[Path]:
                     continue
                 if filename.endswith(SUFFIXES):
                     continue
-                yield Path(directory) / filename
+                source = Path(directory) / filename
+                if str(source.relative_to(ROOT)) not in INTERNAL_DOCUMENTS:
+                    yield source
 
 
 def known_keys() -> tuple[bytes, ...]:
@@ -119,9 +122,7 @@ def export(destination: Path) -> None:
         if source.is_symlink():
             raise ValueError(f"Nonportable source symlink: {source.relative_to(ROOT)}")
         if any(secret in source.read_bytes() for secret in secrets):
-            raise ValueError(
-                f"Credential found in export source: {source.relative_to(ROOT)}"
-            )
+            raise ValueError(f"Credential found in export source: {source.relative_to(ROOT)}")
     destination.mkdir(parents=True)
     manifest = {}
     for source in selected:
@@ -136,11 +137,11 @@ def export(destination: Path) -> None:
     (destination / "release-manifest.json").write_text(
         json.dumps(
             {
-                "created_at": datetime.now(UTC).isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
                 "source": "working tree snapshot",
                 "files": manifest,
                 "secrets_included": False,
-                "scope": "No .git, credentials, caches, raw data or local state; this is not a published clone",
+                "scope": "Includes compressed organizer sources and predictions; excludes .git, credentials, caches and local state",
             },
             ensure_ascii=False,
             indent=2,

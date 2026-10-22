@@ -24,6 +24,7 @@ blob-report/
 .idea/
 data/
 var/
+logs/
 *.sqlite
 *.sqlite3
 *.db
@@ -31,3 +32,12 @@ var/
 *.db-shm
 *.sqlite-wal
 *.sqlite-shm
+
+venv/
+*.pyc
+ai.env
+logs/*.log
+.vscode/
+
+/artifacts/
+/examples/

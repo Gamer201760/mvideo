@@ -77,6 +77,9 @@ def number_support(answer: FieldAnswer) -> tuple[float, float]:
 
 def field_forms(answer: FieldAnswer, definition: CatalogField | None) -> tuple[str, ...]:
     aliases = definition.aliases if definition else ()
+    memory_name = re.sub(r"\s*\((?:rom|ram)\)\s*$", "", answer.attribute, flags=re.IGNORECASE)
+    if memory_name != answer.attribute:
+        aliases = (*aliases, memory_name)
     brands = ("бренд", "brand", "марка", "торговая марка")
     if match_form(answer.attribute).strip() in brands:
         aliases = (*aliases, *brands)

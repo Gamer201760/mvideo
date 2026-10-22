@@ -2,7 +2,14 @@
 name = "product-attributes"
 version = "0.2.0"
 requires-python = ">=3.12"
-dependencies = ["fastapi>=0.143.1", "httpx>=0.28.1", "scikit-learn>=1.9.1", "uvicorn>=0.54.0", "aiosqlite>=0.21.0"]
+dependencies = [
+    "fastapi>=0.143.1",
+    "httpx>=0.28.1",
+    "scikit-learn>=1.9.1",
+    "uvicorn>=0.54.0",
+    "aiosqlite>=0.21.0",
+    "jsonschema==4.26.0",
+]
 
 [dependency-groups]
 benchmark = [
@@ -43,5 +50,5 @@ module = ["sklearn", "sklearn.*", "scipy", "scipy.*", "threadpoolctl", "pyarrow"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["nbformat", "nbformat.*", "nbclient", "nbclient.*", "jupyter_client", "jupyter_client.*"]
+module = ["nbformat", "nbformat.*", "nbclient", "nbclient.*", "jupyter_client", "jupyter_client.*", "jsonschema", "jsonschema.*"]
 ignore_missing_imports = true

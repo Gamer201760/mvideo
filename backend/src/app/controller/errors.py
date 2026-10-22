@@ -14,6 +14,9 @@ from app.domain.errors import (
     ModelInputTooLarge,
     ModelTimeout,
     RunNotFound,
+    StorageBusy,
+    StorageFailure,
+    StorageUnavailable,
 )
 from app.domain.review import (
     InvalidCorrection,
@@ -27,6 +30,9 @@ from app.domain.review import (
 from app.usecase.interface import Logger
 
 STATUS_BY_ERROR: dict[type[DomainError], HTTPStatus] = {
+    StorageBusy: HTTPStatus.SERVICE_UNAVAILABLE,
+    StorageUnavailable: HTTPStatus.SERVICE_UNAVAILABLE,
+    StorageFailure: HTTPStatus.INTERNAL_SERVER_ERROR,
     RunNotFound: HTTPStatus.NOT_FOUND,
     InvalidQuestion: HTTPStatus.UNPROCESSABLE_ENTITY,
     ModelFailure: HTTPStatus.SERVICE_UNAVAILABLE,

@@ -15,5 +15,6 @@ def match_character(character: str) -> str:
     return lowered.replace("ё", "е") if len(lowered) == 1 else character
 
 
+@lru_cache(maxsize=8192)
 def matching_text(text: str) -> str:
     return "".join(match_character(character) for character in text)

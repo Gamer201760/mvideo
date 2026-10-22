@@ -16,6 +16,7 @@ RUN uv sync --locked --no-install-project --no-default-groups
 COPY src ./src
 COPY seeds ./seeds
 COPY migrations ./migrations
+COPY logging.json ./logging.json
 USER app
 EXPOSE 8000
-CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--log-config", "logging.json"]
